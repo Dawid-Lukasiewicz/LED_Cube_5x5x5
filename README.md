@@ -20,3 +20,13 @@ https://youtu.be/NpTNd8zq_Pg
 <p align="center">
   Scheme of 125 LED's
 </p>
+
+![Scheme-MCU](https://user-images.githubusercontent.com/62220648/164736124-25907489-04eb-4d05-99e8-45eada0dbdfe.jpg)
+<p align="center">
+  Scheme of MCU placement and it's peripherials
+</p>
+
+![Scheme-Transistor](https://user-images.githubusercontent.com/62220648/164736286-79ba2c55-30b3-454f-a71d-779dbadbbc2f.jpg)
+<p align="center">
+  Scheme of module allowing to control 125 LED's
+</p>
