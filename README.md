@@ -25,6 +25,10 @@ https://youtu.be/NpTNd8zq_Pg
 <p align="center">
   Scheme of MCU placement and it's peripherials
 </p>
+- Powered with 5V by USB mini-B input
+- 2 buttons to navigate throughout menu
+- 1 button to choose display pattern and leave one
+- TransistorSwitches is a scheme of electronics allowing to control 125 LED's with 15 output pins of MCU showed belowe
 
 ![Scheme-Transistor](https://user-images.githubusercontent.com/62220648/164736286-79ba2c55-30b3-454f-a71d-779dbadbbc2f.jpg)
 <p align="center">
