@@ -25,7 +25,7 @@ https://youtu.be/NpTNd8zq_Pg
 <p align="center">
   Scheme of MCU placement and it's peripherials
 </p>
-##
+
 - Powered with 5V by USB mini-B input
 - 2 buttons to navigate throughout menu
 - 1 button to choose display pattern and leave one
