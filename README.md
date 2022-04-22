@@ -10,6 +10,8 @@ There are 6 displays pattern on digits from 0 to 5
 - Crusher
 - Running points
 - Expanding cube
+
+## Presentation
 Presentation of working code and (electronics was still in progress)
 https://youtu.be/NpTNd8zq_Pg
 
