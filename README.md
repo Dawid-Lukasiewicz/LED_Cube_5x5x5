@@ -17,3 +17,6 @@ https://youtu.be/NpTNd8zq_Pg
 
 ## Electronic schematic
 ![Scheme-LED](https://user-images.githubusercontent.com/62220648/164735447-10ad1311-a12c-4e7d-9ef5-8022c1860d6d.jpg)
+<p align="center">
+  Scheme of 125 LED's
+</p>
