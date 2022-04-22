@@ -1,4 +1,4 @@
-# This is a code uploaded into ATmega32P MCU.
+# This is a code uploaded into ATmega32P MCU
 ## Menu loop
 When powered the cube displays 0 digit. By pressing "up button" you can increment the digit displayed by one. Each digit represenst one display pattern. When "action button" pressed the pattern displays
 
