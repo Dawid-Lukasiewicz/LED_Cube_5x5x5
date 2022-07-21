@@ -10,3 +10,6 @@ __start__: Numbers.h Functions.h main.c
 
 flash: build.elf
 	sudo ${AVRDUDE} -e -U flash:w:build.elf
+
+clean: 
+	rm *.gch *.o *.elf
