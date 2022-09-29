@@ -9,7 +9,8 @@ pico_sdk_init()
 
 add_executable(main
   main.cpp
-  cube_states.cpp
+  cube.cpp
+  led.cpp
 )
 
 pico_enable_stdio_usb(main 1)
