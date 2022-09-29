@@ -29,12 +29,13 @@ public:
     uint8_t __y;
     uint8_t __z;
 
-    led() = delete;
+    led();
     led(uint8_t x, uint8_t y, uint8_t z);
     ~led();
 
-    void __set();
-    void __clr();
+    void __set(uint8_t x, uint8_t y, uint8_t z);
+    void __on();
+    void __off();
 };
 
 #endif
