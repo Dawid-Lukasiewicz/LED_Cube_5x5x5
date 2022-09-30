@@ -35,11 +35,21 @@ void cube::add_leds(uint8_t x, uint8_t y, uint8_t z)
 void cube::display()
 {
     int size = __leds.size();
-    for (uint8_t i = 0; i < size; i++)
+    if (__display_flag == 0)
     {
-        __leds.at(i).__on();
-        sleep_ms(50);
-        __leds.at(i).__off();
+        __display_flag = 1;
+        __display_start = get_absolute_time();
     }
-    
+    else if (__display_flag == 1 && get_absolute_time() - __display_start <= 100)
+    {
+        __leds.at(__display_counter).__on();
+    }
+    else
+    {
+        __display_flag = 0;
+        __leds.at(__display_counter).__off();
+
+        ++__display_counter;
+        if (__display_counter >= size) __display_counter = 0;
+    }
 }
