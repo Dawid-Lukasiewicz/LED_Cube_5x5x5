@@ -49,20 +49,43 @@ int main()
     // uint8_t led_count = 0;
     cube cube_state(125);
 
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            for (int k = 0; k < 5; k++)
-            {
-                cube_state.add_leds(X_table[k], Y_table[j], Z_table[i]);
-            }
-        }
-    }
-
+    int a=1, b=1, c=1;
     while(1)
     {
-        cube_state.display();
+        if (cube_state.get_display_state() == 0)
+        {
+            cube_state.clr_leds();
+            for (int i = 0; i < a; i++)
+            {
+                for (int j = 0; j < b; j++)
+                {
+                    for (int k = 0; k < c; k++)
+                    {
+                        cube_state.add_leds(X_table[k], Y_table[j], Z_table[i]);
+                    }
+                }
+            }
+            if (c < 5)
+                ++c;
+            else if (b < 5)
+            {
+                ++b;
+            }
+            else if (a < 5)
+            {
+                ++a;
+            }
+            else
+            {
+                a = 1;
+                b = 1;
+                c = 1;
+            }
+        }
+        cube_state.display(3000);
+
+        if (cube_state.get_display_state() == 2)
+            cube_state.reset_display_state();
     }
     
     return 0;
