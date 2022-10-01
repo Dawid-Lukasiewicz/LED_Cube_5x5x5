@@ -35,12 +35,13 @@ void cube::add_leds(uint8_t x, uint8_t y, uint8_t z)
 void cube::display()
 {
     int size = __leds.size();
+    
     if (__display_flag == 0)
     {
         __display_flag = 1;
         __display_start = get_absolute_time();
     }
-    else if (__display_flag == 1 && get_absolute_time() - __display_start <= 100)
+    if (__display_flag == 1 &&  absolute_time_diff_us(__display_start, get_absolute_time()) <= 140)
     {
         __leds.at(__display_counter).__on();
     }

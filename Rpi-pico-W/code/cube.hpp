@@ -12,7 +12,7 @@ class cube
 {
 private:
     std::vector<led> __leds;
-    absolute_time_t __display_start = 0;
+    absolute_time_t __display_start;
     uint8_t __display_counter = 0;
     uint8_t __display_flag = 0;
 
