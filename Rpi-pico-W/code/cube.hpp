@@ -34,10 +34,10 @@ public:
     ~cube();
     
     // Not sure if this one should be 
-    void add_led(led *led);
-    void add_led(led &led);
-    void add_led(std::vector<led> &leds);
-    void add_leds(uint8_t x, uint8_t y, uint8_t z);
+    void add_leds(led *led);
+    void add_leds(led &led);
+    void add_leds(std::vector<led> &leds);
+    void add_led(uint8_t x, uint8_t y, uint8_t z);
 
     void clr_leds();
     /* Inefficient way to find and clear led by its coords*/

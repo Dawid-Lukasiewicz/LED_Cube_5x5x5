@@ -11,22 +11,22 @@ cube::cube(uint32_t size)
 cube::~cube() {}
 
 // Not sure if this should be here
-void cube::add_led(led *led)
+void cube::add_leds(led *led)
 {
     __leds.push_back(*led);
 }
 
-void cube::add_led(led &led)
+void cube::add_leds(led &led)
 {
     __leds.push_back(led);
 }
 
-void cube::add_led(std::vector<led> &leds)
+void cube::add_leds(std::vector<led> &leds)
 {
     __leds.insert(__leds.begin(), leds.begin(), leds.end());
 }
 
-void cube::add_leds(uint8_t x, uint8_t y, uint8_t z)
+void cube::add_led(uint8_t x, uint8_t y, uint8_t z)
 {
     led new_led(x, y, z);
     __leds.push_back(new_led);

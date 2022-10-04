@@ -21,6 +21,10 @@
 #define Z3 21U
 #define Z4 20U
 
+const uint8_t X_table[5] = {X0, X1, X2, X3, X4};
+const uint8_t Y_table[5] = {Y0, Y1, Y2, Y3, Y4};
+const uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
+
 class led
 {
 public:

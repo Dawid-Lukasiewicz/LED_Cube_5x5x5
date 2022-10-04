@@ -7,7 +7,7 @@
 
 /*custom library*/
 #include "cube.hpp"
-
+#include "numbers.hpp"
 
 #define SET_X(x) gpio_put((x), 0)
 #define CLEAR_X(x) gpio_put((x), 1)
@@ -18,19 +18,17 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-uint8_t X_table[5] = {X0, X1, X2, X3, X4};
-uint8_t Y_table[5] = {Y0, Y1, Y2, Y3, Y4};
-uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
+extern const uint8_t X_table[5];
+extern const uint8_t Y_table[5];
+extern const uint8_t Z_table[5];
 
+uint8_t display_number = 0;
 
-int main()
+void init_leds()
 {
     gpio_init(25U);
     gpio_set_dir(25U, GPIO_OUT);
     gpio_put(25U, 1);
-
-    
-
     for(int i = 0; i < 5; i++)
     {
         gpio_init(X_table[i]);
@@ -45,14 +43,73 @@ int main()
         CLEAR_Y(Y_table[i]);
         CLEAR_Z(Z_table[i]);
     }
+}
+
+int main()
+{
+    init_leds();
+    cube Cube(125);
+
+    while(1)
+    {
+        switch (display_number)
+        {
+        case 0:
+            zero(Cube, 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 1:
+            one(Cube, 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 2:
+            two(Cube, 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 3:
+            three(Cube, 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        
+        default:
+            display_number = 0;
+            break;
+        }
+        
+    }
+    
+    return 0;
+}
+
+
+void const testing_main()
+{
     // led leds[125];
     // uint8_t led_count = 0;
     cube cube_state(125);
 
     int a=1, b=1, c=1;
-    while(1)
-    {
-        if (cube_state.get_display_state() == 0)
+    if (cube_state.get_display_state() == 0)
         {
             cube_state.clr_leds();
             for (int i = 0; i < a; i++)
@@ -61,7 +118,7 @@ int main()
                 {
                     for (int k = 0; k < c; k++)
                     {
-                        cube_state.add_leds(X_table[k], Y_table[j], Z_table[i]);
+                        cube_state.add_led(X_table[k], Y_table[j], Z_table[i]);
                     }
                 }
             }
@@ -82,11 +139,9 @@ int main()
                 c = 1;
             }
         }
-        cube_state.display(3000);
+        cube_state.display(500);
 
         if (cube_state.get_display_state() == 2)
             cube_state.reset_display_state();
-    }
-    
-    return 0;
+
 }
