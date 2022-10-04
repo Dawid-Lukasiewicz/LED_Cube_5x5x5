@@ -63,6 +63,7 @@ void cube::display(uint64_t display_time_ms)
     if (__display_state == 0)
     {
         __display_state = 1;
+        __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US / (__leds.size()*DISPLAY_FREQ);
         __display_time = display_time_ms*SCALE_MS_TO_US;
         __display_start = get_absolute_time();
@@ -93,7 +94,10 @@ void cube::display(uint64_t display_time_ms)
         }
     }
     else
+    {
+        __leds.at(__display_led_counter).__off();
         __display_state = 2;
+    }
 }
 
 flag cube::get_display_state()
