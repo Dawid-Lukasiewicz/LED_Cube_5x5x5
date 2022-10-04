@@ -46,6 +46,9 @@ public:
     void display();
     void display(uint64_t display_time_ms);
 
+    void change_X(uint8_t x);
+    void change_Y(uint8_t y);
+    void change_Z(uint8_t z);
 
     flag get_display_state();
     void reset_display_state();

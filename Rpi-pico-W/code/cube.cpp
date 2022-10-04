@@ -100,6 +100,30 @@ void cube::display(uint64_t display_time_ms)
     }
 }
 
+void cube::change_X(uint8_t x)
+{
+    for (uint8_t i = 0; i < __leds.size(); i++)
+    {
+        __leds.at(i).__x = x;
+    }
+}
+
+void cube::change_Y(uint8_t y)
+{
+    for (uint8_t i = 0; i < __leds.size(); i++)
+    {
+        __leds.at(i).__y = y;
+    }
+}
+
+void cube::change_Z(uint8_t z)
+{
+    for (uint8_t i = 0; i < __leds.size(); i++)
+    {
+        __leds.at(i).__z = z;
+    }
+}
+
 flag cube::get_display_state()
 {
     return __display_state;
