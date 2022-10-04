@@ -49,13 +49,13 @@ int main()
 {
     init_leds();
     cube Cube(125);
-
+    
     while(1)
     {
         switch (display_number)
         {
         case 0:
-            zero(Cube, 3000);
+            zero(Cube, X_table[2], 3000);
             if (Cube.get_display_state() == 2)
             {
                 Cube.clr_leds();
@@ -64,7 +64,7 @@ int main()
             }
             break;
         case 1:
-            one(Cube, 3000);
+            one(Cube, X_table[2], 3000);
             if (Cube.get_display_state() == 2)
             {
                 Cube.clr_leds();
@@ -73,7 +73,7 @@ int main()
             }
             break;
         case 2:
-            two(Cube, 3000);
+            two(Cube, X_table[2], 3000);
             if (Cube.get_display_state() == 2)
             {
                 Cube.clr_leds();
@@ -82,7 +82,61 @@ int main()
             }
             break;
         case 3:
-            three(Cube, 3000);
+            three(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 4:
+            four(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 5:
+            five(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 6:
+            six(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 7:
+            seven(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 8:
+            eight(Cube, X_table[2], 3000);
+            if (Cube.get_display_state() == 2)
+            {
+                Cube.clr_leds();
+                Cube.reset_display_state();
+                ++display_number;
+            }
+            break;
+        case 9:
+            nine(Cube, X_table[2], 3000);
             if (Cube.get_display_state() == 2)
             {
                 Cube.clr_leds();
