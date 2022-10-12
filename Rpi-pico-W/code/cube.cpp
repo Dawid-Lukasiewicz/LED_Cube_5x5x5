@@ -37,14 +37,17 @@ void cube::clr_leds()
     __leds.clear();
 }
 
+// TO FIX
 void cube::display()
 {
     if (__display_led == 0)
     {
-        __display_led = 1;
+        __display_state = 1;
+        __display_led_counter = 0;
+        __display_led_time = SCALE_S_TO_US / (__leds.size()*DISPLAY_FREQ);
         __display_start = get_absolute_time();
     }
-    if (__display_led == 1 &&  absolute_time_diff_us(__display_start, get_absolute_time()) <= 140)
+    if (__display_led == 1 &&  absolute_time_diff_us(__display_start, get_absolute_time()) <= __display_led_time)
     {
         __leds.at(__display_led_counter).__on();
     }
@@ -104,6 +107,7 @@ void cube::change_X(uint8_t x)
 {
     for (uint8_t i = 0; i < __leds.size(); i++)
     {
+        __leds.at(i).__off();
         __leds.at(i).__x = x;
     }
 }
@@ -112,6 +116,7 @@ void cube::change_Y(uint8_t y)
 {
     for (uint8_t i = 0; i < __leds.size(); i++)
     {
+        __leds.at(i).__off();
         __leds.at(i).__y = y;
     }
 }
@@ -120,6 +125,7 @@ void cube::change_Z(uint8_t z)
 {
     for (uint8_t i = 0; i < __leds.size(); i++)
     {
+        __leds.at(i).__off();
         __leds.at(i).__z = z;
     }
 }

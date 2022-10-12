@@ -43,6 +43,7 @@ public:
     /* Inefficient way to find and clear led by its coords*/
     void clr_leds(uint8_t x, uint8_t y, uint8_t z);
 
+    // TO FIX
     void display();
     void display(uint64_t display_time_ms);
 
