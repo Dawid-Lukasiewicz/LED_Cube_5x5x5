@@ -3,7 +3,7 @@
 
 /*pico-sdk library*/
 #include "pico/stdlib.h"
-// #include "pico/cyw43_arch.h"
+#include "pico/cyw43_arch.h"
 
 /*custom library*/
 #include "cube.hpp"
@@ -26,9 +26,16 @@ uint8_t display_number = 0;
 
 void init_leds()
 {
-    gpio_init(25U);
-    gpio_set_dir(25U, GPIO_OUT);
-    gpio_put(25U, 1);
+    #ifndef pico_w
+        gpio_init(25U);
+        gpio_set_dir(25U, GPIO_OUT);
+        gpio_put(25U, 1);
+    #else
+        // gpio_init(CYW43_WL_GPIO_LED_PIN);
+        // gpio_set_dir(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+        // gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+    #endif
     for(int i = 0; i < 5; i++)
     {
         gpio_init(X_table[i]);

@@ -7,14 +7,13 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 
-# add_definitions(-DPICO_BOARD=pico_w)
-
 add_executable(main
-  main.cpp
-  cube.cpp
-  led.cpp
-  numbers.cpp
+    main.cpp
+    cube.cpp
+    led.cpp
+    numbers.cpp
 )
+set_target_properties(main PROPERTIES PICO_BOARD pico_w)
 
 pico_enable_stdio_usb(main 1)
 pico_enable_stdio_uart(main 1)
