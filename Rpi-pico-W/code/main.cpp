@@ -18,11 +18,15 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
+#define NUMBER_DISPLAY_TIME 500000
+
 extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
 extern const uint8_t Z_table[5];
 
 uint8_t display_number = 0;
+absolute_time_t number_display_start = get_absolute_time();
+uint8_t x_coord = 0;
 
 void init_leds()
 {
@@ -56,105 +60,57 @@ int main()
 {
     init_leds();
     cube Cube(125);
-    
     while(1)
     {
         switch (display_number)
         {
         case 0:
-            zero(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            zero(Cube, X_table[x_coord], 3000);
             break;
         case 1:
-            one(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            one(Cube, X_table[x_coord], 3000);
             break;
         case 2:
-            two(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            two(Cube, X_table[x_coord], 3000);
             break;
         case 3:
-            three(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            three(Cube, X_table[x_coord], 3000);
             break;
         case 4:
-            four(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            four(Cube, X_table[x_coord], 3000);
             break;
         case 5:
-            five(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            five(Cube, X_table[x_coord], 3000);
             break;
         case 6:
-            six(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            six(Cube, X_table[x_coord], 3000);
             break;
         case 7:
-            seven(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            seven(Cube, X_table[x_coord], 3000);
             break;
         case 8:
-            eight(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            eight(Cube, X_table[x_coord], 3000);
             break;
         case 9:
-            nine(Cube, X_table[2], 3000);
-            if (Cube.get_display_state() == 2)
-            {
-                Cube.clr_leds();
-                Cube.reset_display_state();
-                ++display_number;
-            }
+            nine(Cube, X_table[x_coord], 3000);
             break;
         
         default:
             display_number = 0;
             break;
+        }
+        if (Cube.get_display_state() == 2)
+        {
+            Cube.clr_leds();
+            Cube.reset_display_state();
+            ++display_number;
+        }
+        else if (Cube.get_display_state() == 1 && absolute_time_diff_us(number_display_start, get_absolute_time()) >= NUMBER_DISPLAY_TIME)
+        {
+            ++x_coord;
+            if (x_coord >= 5)   x_coord = 0;
+            Cube.change_X(X_table[x_coord]);
+            number_display_start = get_absolute_time();
         }
         
     }
