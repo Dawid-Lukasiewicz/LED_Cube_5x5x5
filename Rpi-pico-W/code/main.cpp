@@ -88,34 +88,34 @@ int main()
         switch (display_number)
         {
         case 0:
-            zero(Cube, X_table[x_coord], 3000);
+            zero(Cube, X_table[x_coord]);
             break;
         case 1:
-            one(Cube, X_table[x_coord], 3000);
+            one(Cube, X_table[x_coord]);
             break;
         case 2:
-            two(Cube, X_table[x_coord], 3000);
+            two(Cube, X_table[x_coord]);
             break;
         case 3:
-            three(Cube, X_table[x_coord], 3000);
+            three(Cube, X_table[x_coord]);
             break;
         case 4:
-            four(Cube, X_table[x_coord], 3000);
+            four(Cube, X_table[x_coord]);
             break;
         case 5:
-            five(Cube, X_table[x_coord], 3000);
+            five(Cube, X_table[x_coord]);
             break;
         case 6:
-            six(Cube, X_table[x_coord], 3000);
+            six(Cube, X_table[x_coord]);
             break;
         case 7:
-            seven(Cube, X_table[x_coord], 3000);
+            seven(Cube, X_table[x_coord]);
             break;
         case 8:
-            eight(Cube, X_table[x_coord], 3000);
+            eight(Cube, X_table[x_coord]);
             break;
         case 9:
-            nine(Cube, X_table[x_coord], 3000);
+            nine(Cube, X_table[x_coord]);
             break;
         
         default:
