@@ -40,24 +40,32 @@ void cube::clr_leds()
 // TO FIX
 void cube::display()
 {
-    if (__display_led == 0)
+    if (__display_state == 0)
     {
         __display_state = 1;
         __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US / (__leds.size()*DISPLAY_FREQ);
-        __display_start = get_absolute_time();
     }
-    if (__display_led == 1 &&  absolute_time_diff_us(__display_start, get_absolute_time()) <= __display_led_time)
+    if (__display_state == 1)
     {
-        __leds.at(__display_led_counter).__on();
-    }
-    else
-    {
-        __display_led = 0;
-        __leds.at(__display_led_counter).__off();
+        if (__display_led == 0)
+        {
+            __display_led = 1;
+            __display_led_start = get_absolute_time();
+        }
+        if ( __display_led == 1
+                && absolute_time_diff_us(__display_led_start, get_absolute_time()) <= __display_led_time )
+            {
+                __leds.at(__display_led_counter).__on();
+            }
+        else
+        {
+            __display_led = 0;
+            __leds.at(__display_led_counter).__off();
 
-        ++__display_led_counter;
-        if (__display_led_counter >= __leds.size()) __display_led_counter = 0;
+            ++__display_led_counter;
+            if (__display_led_counter >= __leds.size()) __display_led_counter = 0;
+        }
     }
 }
 
