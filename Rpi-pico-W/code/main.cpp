@@ -20,11 +20,16 @@
 
 #define NUMBER_DISPLAY_TIME 500000
 
+#define BUTTON_UP 7U
+#define BUTTON_DOWN 8U
+#define BUTTON_SELECT 9U
+
+
 extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
 extern const uint8_t Z_table[5];
 
-uint8_t display_number = 0;
+int8_t display_number = 0;
 absolute_time_t number_display_start = get_absolute_time();
 uint8_t x_coord = 0;
 
@@ -46,8 +51,8 @@ void init_leds()
         gpio_init(Y_table[i]);
         gpio_init(Z_table[i]);
 
-        gpio_set_dir(X_table[i], GPIO_OUT);    
-        gpio_set_dir(Y_table[i], GPIO_OUT);    
+        gpio_set_dir(X_table[i], GPIO_OUT);
+        gpio_set_dir(Y_table[i], GPIO_OUT);
         gpio_set_dir(Z_table[i], GPIO_OUT);
 
         CLEAR_X(X_table[i]);
@@ -56,10 +61,28 @@ void init_leds()
     }
 }
 
+void init_buttons()
+{
+    gpio_init(BUTTON_UP);
+    gpio_set_dir(BUTTON_UP, GPIO_IN);
+    gpio_pull_up(BUTTON_UP);
+
+    gpio_init(BUTTON_DOWN);
+    gpio_set_dir(BUTTON_DOWN, GPIO_IN);
+    gpio_pull_up(BUTTON_DOWN);
+
+    gpio_init(BUTTON_SELECT);
+    gpio_set_dir(BUTTON_SELECT, GPIO_IN);
+    gpio_pull_up(BUTTON_SELECT);
+}
+
 int main()
 {
     init_leds();
+    init_buttons();
     cube Cube(125);
+
+    // gpio_get()
     while(1)
     {
         switch (display_number)
@@ -99,19 +122,28 @@ int main()
             display_number = 0;
             break;
         }
-        if (Cube.get_display_state() == 2)
+        if (gpio_get(BUTTON_DOWN) == 0)
+        {
+            Cube.clr_leds();
+            Cube.reset_display_state();
+            --display_number;
+        }
+        else if (gpio_get(BUTTON_UP) == 0)
         {
             Cube.clr_leds();
             Cube.reset_display_state();
             ++display_number;
         }
-        else if (Cube.get_display_state() == 1 && absolute_time_diff_us(number_display_start, get_absolute_time()) >= NUMBER_DISPLAY_TIME)
+        if (Cube.get_display_state() == 1 && absolute_time_diff_us(number_display_start, get_absolute_time()) >= NUMBER_DISPLAY_TIME)
         {
             ++x_coord;
             if (x_coord >= 5)   x_coord = 0;
             Cube.change_X(X_table[x_coord]);
             number_display_start = get_absolute_time();
         }
+        if (display_number > 9)         display_number = 0;
+        else if (display_number < 0)    display_number = 9;
+        
         
     }
     
