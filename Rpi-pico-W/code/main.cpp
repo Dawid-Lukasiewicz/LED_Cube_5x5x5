@@ -18,7 +18,8 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-#define NUMBER_DISPLAY_TIME 500000
+#define NUMBER_DISPLAY_TIME 1000000
+#define DEBOUNCE_TIME 10000
 
 #define BUTTON_UP 7U
 #define BUTTON_DOWN 8U
@@ -29,6 +30,11 @@ extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
 extern const uint8_t Z_table[5];
 
+int8_t button_pushed = 0;
+int8_t button_pushed_once = 0;
+int8_t button_released = 0;
+absolute_time_t pushed_start;
+absolute_time_t released_start;
 int8_t display_number = 0;
 absolute_time_t number_display_start = get_absolute_time();
 uint8_t x_coord = 0;
@@ -122,20 +128,47 @@ int main()
             display_number = 0;
             break;
         }
-        if (gpio_get(BUTTON_DOWN) == 0)
+
+        /* Button logic */
+        if ( (gpio_get(BUTTON_UP) == 1 &&
+                gpio_get(BUTTON_DOWN) == 1 &&
+                button_pushed == 1 ) &&
+                absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
+        {
+            button_pushed = 0;
+            button_released = 1;
+            released_start = get_absolute_time();
+        }
+        else if (button_released && 
+            absolute_time_diff_us(released_start, get_absolute_time()) >= DEBOUNCE_TIME)
+        {
+            button_released = 0;
+        }
+        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released)
         {
             Cube.clr_leds();
             Cube.reset_display_state();
             --display_number;
+            button_pushed = 1;
+            pushed_start = get_absolute_time();
+
         }
-        else if (gpio_get(BUTTON_UP) == 0)
+        else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released)
         {
             Cube.clr_leds();
             Cube.reset_display_state();
             ++display_number;
+            button_pushed = 1;
+            pushed_start = get_absolute_time();
+
         }
-        if (Cube.get_display_state() == 1 && absolute_time_diff_us(number_display_start, get_absolute_time()) >= NUMBER_DISPLAY_TIME)
+
+        if (button_pushed_once ||
+            ( Cube.get_display_state() == 1 &&
+            absolute_time_diff_us(number_display_start,
+                                get_absolute_time()) >= NUMBER_DISPLAY_TIME) )
         {
+            button_pushed_once = 0;
             ++x_coord;
             if (x_coord >= 5)   x_coord = 0;
             Cube.change_X(X_table[x_coord]);
