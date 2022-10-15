@@ -34,6 +34,11 @@ void cube::add_led(uint8_t x, uint8_t y, uint8_t z)
 
 void cube::clr_leds()
 {
+    for (int i = 0; i < __leds.size(); i++)
+    {
+        __leds[i].__off();
+    }
+    
     __leds.clear();
 }
 

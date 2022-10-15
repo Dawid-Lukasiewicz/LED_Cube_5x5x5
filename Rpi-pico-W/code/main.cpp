@@ -150,6 +150,7 @@ int main()
             Cube.reset_display_state();
             --display_number;
             button_pushed = 1;
+            button_pushed_once = 1;
             pushed_start = get_absolute_time();
 
         }
@@ -159,11 +160,13 @@ int main()
             Cube.reset_display_state();
             ++display_number;
             button_pushed = 1;
+            button_pushed_once = 1;
             pushed_start = get_absolute_time();
 
         }
 
         if (button_pushed_once ||
+            (!button_pushed) &&
             ( Cube.get_display_state() == 1 &&
             absolute_time_diff_us(number_display_start,
                                 get_absolute_time()) >= NUMBER_DISPLAY_TIME) )
