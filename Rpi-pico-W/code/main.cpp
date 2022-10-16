@@ -1,5 +1,7 @@
 /*standard library*/
 #include <stdio.h>
+#include <cstdlib>
+#include <ctime>
 
 /*pico-sdk library*/
 #include "pico/stdlib.h"
@@ -8,6 +10,7 @@
 /*custom library*/
 #include "cube.hpp"
 #include "numbers.hpp"
+#include "animations.hpp"
 
 #define SET_X(x) gpio_put((x), 0)
 #define CLEAR_X(x) gpio_put((x), 1)
@@ -30,26 +33,34 @@ extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
 extern const uint8_t Z_table[5];
 
-int8_t button_pushed = 0;
-int8_t button_pushed_once = 0;
-int8_t button_released = 0;
+typedef uint8_t flag;
+
+flag button_select_flag = 0;
+flag select_mode = 0;
+
+flag button_pushed = 0;
+flag button_pushed_once = 0;
+flag button_released = 0;
+
 absolute_time_t pushed_start;
 absolute_time_t released_start;
+
 int8_t display_number = 0;
 absolute_time_t number_display_start = get_absolute_time();
+
 uint8_t x_coord = 0;
 
 void init_leds()
 {
-    #ifndef pico_w
+    #ifdef pico_wireless
+        gpio_init(CYW43_WL_GPIO_LED_PIN);
+        gpio_set_dir(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+        gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+        // cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+    #else
         gpio_init(25U);
         gpio_set_dir(25U, GPIO_OUT);
         gpio_put(25U, 1);
-    #else
-        // gpio_init(CYW43_WL_GPIO_LED_PIN);
-        // gpio_set_dir(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
-        // gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
     #endif
     for(int i = 0; i < 5; i++)
     {
@@ -67,6 +78,12 @@ void init_leds()
     }
 }
 
+void button_select_callback(uint gpio, uint32_t event)
+{
+    button_select_flag = 1;
+    pushed_start = get_absolute_time();
+}
+
 void init_buttons()
 {
     gpio_init(BUTTON_UP);
@@ -80,48 +97,80 @@ void init_buttons()
     gpio_init(BUTTON_SELECT);
     gpio_set_dir(BUTTON_SELECT, GPIO_IN);
     gpio_pull_up(BUTTON_SELECT);
+    gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_EDGE_FALL, 1, button_select_callback);
+    // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_LEVEL_LOW, 1, button_select_callback);
 }
 
 int main()
 {
+    std::srand(std::time(nullptr));
     init_leds();
     init_buttons();
     cube Cube(125);
 
-    // gpio_get()
     while(1)
     {
         switch (display_number)
         {
         case 0:
-            zero(Cube, X_table[x_coord]);
+            if (!select_mode)
+                zero(Cube, X_table[x_coord]);
+            else
+            {
+                random_led(Cube);
+            }
             break;
         case 1:
-            one(Cube, X_table[x_coord]);
+            if (!select_mode)
+                one(Cube, X_table[x_coord]);
             break;
         case 2:
-            two(Cube, X_table[x_coord]);
+            if (!select_mode)
+                two(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 3:
-            three(Cube, X_table[x_coord]);
+            if (!select_mode)
+                three(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 4:
-            four(Cube, X_table[x_coord]);
+            if (!select_mode)
+                four(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 5:
-            five(Cube, X_table[x_coord]);
+            if (!select_mode)
+                five(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 6:
-            six(Cube, X_table[x_coord]);
+            if (!select_mode)
+                six(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 7:
-            seven(Cube, X_table[x_coord]);
+            if (!select_mode)
+                seven(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 8:
-            eight(Cube, X_table[x_coord]);
+            if (!select_mode)
+                eight(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         case 9:
-            nine(Cube, X_table[x_coord]);
+            if (!select_mode)
+                nine(Cube, X_table[x_coord]);
+            else    {}
+
             break;
         
         default:
@@ -129,11 +178,22 @@ int main()
             break;
         }
 
+        /* Select button debounce */
+        if (button_select_flag &&
+            absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
+        {
+            button_select_flag = 0;
+            select_mode ^= 1;
+            Cube.clr_leds();
+            Cube.reset_display_state();
+        }
+
         /* Button logic */
         if ( (gpio_get(BUTTON_UP) == 1 &&
                 gpio_get(BUTTON_DOWN) == 1 &&
                 button_pushed == 1 ) &&
-                absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
+                absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME &&
+                !select_mode)
         {
             button_pushed = 0;
             button_released = 1;
@@ -144,7 +204,8 @@ int main()
         {
             button_released = 0;
         }
-        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released)
+        /* When Down button pushed first time  */
+        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
         {
             Cube.clr_leds();
             Cube.reset_display_state();
@@ -154,7 +215,8 @@ int main()
             pushed_start = get_absolute_time();
 
         }
-        else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released)
+        /* When UP button pushed first time  */
+        else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released && !select_mode)
         {
             Cube.clr_leds();
             Cube.reset_display_state();
@@ -165,11 +227,13 @@ int main()
 
         }
 
+        /* Incrementing display number's X position */
         if (button_pushed_once ||
             (!button_pushed) &&
             ( Cube.get_display_state() == 1 &&
             absolute_time_diff_us(number_display_start,
-                                get_absolute_time()) >= NUMBER_DISPLAY_TIME) )
+                                get_absolute_time()) >= NUMBER_DISPLAY_TIME) &&
+            !select_mode)
         {
             button_pushed_once = 0;
             ++x_coord;
