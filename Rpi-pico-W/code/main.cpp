@@ -123,12 +123,16 @@ int main()
         case 1:
             if (!select_mode)
                 one(Cube, X_table[x_coord]);
+            else
+            {
+                rain(Cube);
+            }
             break;
         case 2:
             if (!select_mode)
                 two(Cube, X_table[x_coord]);
-            else    {}
-
+            else
+            {}
             break;
         case 3:
             if (!select_mode)
