@@ -13,6 +13,11 @@ typedef uint8_t flag;
 #define DISPLAY_FREQ 60
 #define SCALE_S_TO_US 1000000
 #define SCALE_MS_TO_US 1000
+#define SCALE_US_TO_MS(us_time) ((us_time)/1000)
+
+#define DISPLAY_STATE_INIT 0
+#define DISPLAY_STATE_RUN 1
+#define DISPLAY_STATE_FINISH 2
 
 class cube
 {
@@ -28,6 +33,7 @@ private:
     uint8_t __display_led_counter = 0;
 
 public:
+    absolute_time_t __public_time;
 
     cube(/* args */);
     cube(uint32_t size);
