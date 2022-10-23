@@ -32,7 +32,7 @@ void one(cube &Cube, uint8_t x)
         Cube.add_led(x, Y3, Z3);
         Cube.add_led(x, Y3, Z4);
         Cube.add_led(x, Y2, Z3);
-        Cube.add_led(x, Y1, Z2);
+        Cube.add_led(x, Y1, Z3);
     }
 
     Cube.display();
@@ -67,7 +67,6 @@ void three(cube &Cube, uint8_t x)
         Cube.add_led(x, Y3, Z4);
         Cube.add_led(x, Y1, Z0);
         Cube.add_led(x, Y2, Z0);
-        Cube.add_led(x, Y1, Z2);
         Cube.add_led(x, Y2, Z2);
         Cube.add_led(x, Y1, Z4);
         Cube.add_led(x, Y2, Z4);
@@ -86,6 +85,7 @@ void four(cube &Cube, uint8_t x)
         Cube.add_led(x, Y2, Z2);
         Cube.add_led(x, Y1, Z2);
         Cube.add_led(x, Y2, Z3);
+        Cube.add_led(x, Y3, Z3);
         Cube.add_led(x, Y3, Z4);
     }
     
@@ -96,15 +96,15 @@ void five(cube &Cube, uint8_t x)
 {
     if (Cube.get_display_state() == 0)
     {
-        Cube.add_led(x, Y3, Z0);
+        Cube.add_led(x, Y1, Z0);
         Cube.add_led(x, Y2, Z0);
-        Cube.add_led(x, Y1, Z1);
+        Cube.add_led(x, Y3, Z1);
         Cube.add_led(x, Y2, Z2);
-        Cube.add_led(x, Y3, Z2);
-        Cube.add_led(x, Y3, Z3);
-        Cube.add_led(x, Y3, Z4);
-        Cube.add_led(x, Y2, Z4);
+        Cube.add_led(x, Y1, Z2);
+        Cube.add_led(x, Y1, Z3);
         Cube.add_led(x, Y1, Z4);
+        Cube.add_led(x, Y2, Z4);
+        Cube.add_led(x, Y3, Z4);
     }
 
     Cube.display();
@@ -119,9 +119,8 @@ void six(cube &Cube, uint8_t x)
         Cube.add_led(x, Y1, Z3);
         Cube.add_led(x, Y1, Z2);
         Cube.add_led(x, Y1, Z1);
-        Cube.add_led(x, Y1, Z0);
         Cube.add_led(x, Y2, Z0);
-        Cube.add_led(x, Y3, Z0);
+        Cube.add_led(x, Y3, Z2);
         Cube.add_led(x, Y3, Z1);
         Cube.add_led(x, Y2, Z2);
     }
