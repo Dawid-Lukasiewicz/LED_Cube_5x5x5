@@ -8,12 +8,15 @@ set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 
 add_executable(main
-    main.cpp
-    cube.cpp
-    led.cpp
-    numbers.cpp
+            main.cpp
+            cube.cpp
+            led.cpp
+            numbers.cpp
+            animations.cpp
 )
+
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
+target_compile_definitions(main PRIVATE PICO_BOARD_DEFINED=pico_wireless)
 
 pico_enable_stdio_usb(main 1)
 pico_enable_stdio_uart(main 1)
