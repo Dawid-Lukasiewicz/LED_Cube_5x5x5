@@ -14,9 +14,9 @@ void random_led(cube &Cube)
     }
     if (Cube.get_display_state() == 0)
     {
-        uint8_t x = std::rand()%5;
-        uint8_t y = std::rand()%5;
-        uint8_t z = std::rand()%5;
+        uint8_t x = std::rand() % MAX_LEDS_X;
+        uint8_t y = std::rand() % MAX_LEDS_Y;
+        uint8_t z = std::rand() % MAX_LEDS_Z;
 
         Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
     }

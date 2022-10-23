@@ -3,6 +3,10 @@
 
 #include "pico/stdlib.h"
 
+#define MAX_LEDS_X 5
+#define MAX_LEDS_Y 5
+#define MAX_LEDS_Z 5
+
 #define X0 15U
 #define X1 13U
 #define X2 12U
