@@ -22,7 +22,6 @@ typedef uint8_t flag;
 class cube
 {
 private:
-    std::vector<led> __leds;
     absolute_time_t __display_start;
     absolute_time_t __display_led_start;
     
@@ -33,6 +32,7 @@ private:
     uint8_t __display_led_counter = 0;
 
 public:
+    std::vector<led> __leds;
     absolute_time_t __public_time;
 
     cube(/* args */);
@@ -47,7 +47,9 @@ public:
 
     void clr_leds();
     /* Inefficient way to find and clear led by its coords*/
-    void clr_leds(uint8_t x, uint8_t y, uint8_t z);
+    void clr_led(uint8_t x, uint8_t y, uint8_t z);
+
+    void emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z);
 
     void display();
     void display(uint64_t display_time_ms);
@@ -55,6 +57,8 @@ public:
     void change_X(uint8_t x);
     void change_Y(uint8_t y);
     void change_Z(uint8_t z);
+
+    led& change_led(uint8_t index);
 
     flag get_display_state();
     void reset_display_state();

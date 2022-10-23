@@ -132,7 +132,9 @@ int main()
             if (!select_mode)
                 two(Cube, X_table[x_coord]);
             else
-            {}
+            {
+                heavy_rain(Cube);
+            }
             break;
         case 3:
             if (!select_mode)

@@ -32,6 +32,15 @@ void cube::add_led(uint8_t x, uint8_t y, uint8_t z)
     __leds.push_back(new_led);
 }
 
+void cube::emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z)
+{
+    if (index < __leds.size())
+    {
+        __leds[index].__off();
+        __leds[index] = led(x, y, z);
+    }
+}
+
 void cube::clr_leds()
 {
     if (__leds.size() == 0)
