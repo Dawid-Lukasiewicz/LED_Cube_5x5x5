@@ -60,7 +60,7 @@ void heavy_rain(cube &Cube)
 {
 
     static flag another_drop;
-    uint rain_time_drop_ms = 100;
+    uint rain_time_drop_ms = 75;
     static uint8_t drop_number = 5;
 
     static led Drops[5];
