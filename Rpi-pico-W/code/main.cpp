@@ -188,8 +188,28 @@ int main()
             Cube.reset_display_state();
         }
 
-        /* Button logic */
-        if ( (gpio_get(BUTTON_UP) == 1 &&
+        /* When Down button pushed first time  */
+        if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
+        {
+            Cube.clr_leds();
+            Cube.reset_display_state();
+            --display_number;
+            button_pushed = 1;
+            button_pushed_once = 1;
+            pushed_start = get_absolute_time();
+        }
+        /* When UP button pushed first time  */
+        else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released && !select_mode)
+        {
+            Cube.clr_leds();
+            Cube.reset_display_state();
+            ++display_number;
+            button_pushed = 1;
+            button_pushed_once = 1;
+            pushed_start = get_absolute_time();
+        }
+        /* Button Up and Down logic */
+        else if ( (gpio_get(BUTTON_UP) == 1 &&
                 gpio_get(BUTTON_DOWN) == 1 &&
                 button_pushed == 1 ) &&
                 absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME &&
@@ -204,28 +224,7 @@ int main()
         {
             button_released = 0;
         }
-        /* When Down button pushed first time  */
-        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
-        {
-            Cube.clr_leds();
-            Cube.reset_display_state();
-            --display_number;
-            button_pushed = 1;
-            button_pushed_once = 1;
-            pushed_start = get_absolute_time();
-
-        }
-        /* When UP button pushed first time  */
-        else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released && !select_mode)
-        {
-            Cube.clr_leds();
-            Cube.reset_display_state();
-            ++display_number;
-            button_pushed = 1;
-            button_pushed_once = 1;
-            pushed_start = get_absolute_time();
-
-        }
+        
 
         /* Incrementing display number's X position */
         if (button_pushed_once ||
