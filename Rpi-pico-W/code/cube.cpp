@@ -44,14 +44,13 @@ void cube::clr_leds()
     __leds.clear();
 }
 
-// TO FIX
 void cube::display()
 {
     if (__display_state == 0)
     {
         __display_state = 1;
         __display_led_counter = 0;
-        __display_led_time = SCALE_S_TO_US / (__leds.size()*DISPLAY_FREQ);
+        __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
     }
     if (__display_state == 1)
     {
@@ -82,8 +81,8 @@ void cube::display(uint64_t display_time_ms)
     {
         __display_state = 1;
         __display_led_counter = 0;
-        __display_led_time = SCALE_S_TO_US / (__leds.size()*DISPLAY_FREQ);
-        __display_time = display_time_ms*SCALE_MS_TO_US;
+        __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
+        __display_time = SCALE_MS_TO_US(display_time_ms);
         __display_start = get_absolute_time();
 
         /* To prevent from partial display assign value at which all leds turn on at least once*/

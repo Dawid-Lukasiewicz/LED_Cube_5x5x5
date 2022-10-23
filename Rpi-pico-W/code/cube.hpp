@@ -11,9 +11,9 @@
 typedef uint8_t flag;
 
 #define DISPLAY_FREQ 60
-#define SCALE_S_TO_US 1000000
-#define SCALE_MS_TO_US 1000
-#define SCALE_US_TO_MS(us_time) ((us_time)/1000)
+#define SCALE_S_TO_US(s_time)       ((s_time)*1000000)
+#define SCALE_MS_TO_US(ms_time)     ((ms_time)*1000)
+#define SCALE_US_TO_MS(us_time)     ((us_time)/1000)
 
 #define DISPLAY_STATE_INIT 0
 #define DISPLAY_STATE_RUN 1
@@ -49,7 +49,6 @@ public:
     /* Inefficient way to find and clear led by its coords*/
     void clr_leds(uint8_t x, uint8_t y, uint8_t z);
 
-    // TO FIX
     void display();
     void display(uint64_t display_time_ms);
 
