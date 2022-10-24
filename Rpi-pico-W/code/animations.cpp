@@ -61,16 +61,16 @@ void heavy_rain(cube &Cube)
 
     static flag another_drop;
     uint rain_time_drop_ms = 75;
-    static uint8_t drop_number = 5;
+    const uint8_t drop_number = 10;
 
-    static led Drops[5];
+    static led Drops[drop_number];
 
     if (Cube.get_display_state() == DISPLAY_STATE_INIT)
     {
         another_drop = 0;
 
         Cube.clr_leds();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < drop_number; i++)
         {
             int8_t x = rand() % MAX_LEDS_X;
             int8_t y = rand() % MAX_LEDS_Y;
@@ -82,7 +82,7 @@ void heavy_rain(cube &Cube)
     }
     else if (SCALE_US_TO_MS(absolute_time_diff_us(Cube.__public_time, get_absolute_time())) > rain_time_drop_ms)
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < drop_number; i++)
         {
             --Drops[i].__z;
             if (Drops[i].__z < 0)
