@@ -21,12 +21,12 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-#define NUMBER_DISPLAY_TIME 1000000
-#define DEBOUNCE_TIME 10000
+#define NUMBER_DISPLAY_TIME     SCALE_S_TO_US(1)
+#define DEBOUNCE_TIME           SCALE_MS_TO_US(50)
 
-#define BUTTON_UP 7U
-#define BUTTON_DOWN 8U
-#define BUTTON_SELECT 9U
+#define BUTTON_UP               7U
+#define BUTTON_DOWN             8U
+#define BUTTON_SELECT           9U
 
 
 extern const uint8_t X_table[5];
@@ -94,6 +94,7 @@ void init_buttons()
     gpio_set_dir(BUTTON_DOWN, GPIO_IN);
     gpio_pull_up(BUTTON_DOWN);
 
+    // resolid the select button
     gpio_init(BUTTON_SELECT);
     gpio_set_dir(BUTTON_SELECT, GPIO_IN);
     gpio_pull_up(BUTTON_SELECT);
