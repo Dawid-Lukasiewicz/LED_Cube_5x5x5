@@ -7,15 +7,15 @@ class led
 {
 public:
 
-    int8_t __x;
-    int8_t __y;
-    int8_t __z;
+    int __x;
+    int __y;
+    int __z;
 
     led();
-    led(int8_t x, int8_t y, int8_t z);
+    led(int x, int y, int z);
     ~led();
 
-    void __set(int8_t x, int8_t y, int8_t z);
+    void __set(int x, int y, int z);
     void __on();
     void __off();
 };

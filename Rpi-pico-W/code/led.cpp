@@ -2,13 +2,13 @@
 
 led::led() {}
 
-led::led(int8_t x, int8_t y, int8_t z)
+led::led(int x, int y, int z)
 : __x(x), __y(y), __z(z)
 {}
 
 led::~led() {}
 
-void led::__set(int8_t x, int8_t y, int8_t z)
+void led::__set(int x, int y, int z)
 {
     __x = x;
     __y = y;
