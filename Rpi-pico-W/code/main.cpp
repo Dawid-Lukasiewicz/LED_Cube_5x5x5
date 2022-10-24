@@ -140,8 +140,10 @@ int main()
         case 3:
             if (!select_mode)
                 three(Cube, X_table[x_coord]);
-            else    {}
-
+            else
+            {
+                expanding_cube(Cube);
+            }
             break;
         case 4:
             if (!select_mode)

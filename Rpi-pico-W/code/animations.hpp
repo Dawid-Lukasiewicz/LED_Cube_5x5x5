@@ -6,5 +6,6 @@
 void random_led(cube &Cube);
 void rain(cube &Cube);
 void heavy_rain(cube &Cube);
+void expanding_cube(cube &Cube);
 
 #endif

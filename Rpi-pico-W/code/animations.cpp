@@ -105,3 +105,145 @@ void heavy_rain(cube &Cube)
     if (!another_drop)
         Cube.display();
 }
+
+void expanding_cube(cube &Cube)
+{
+    int expand_time_ms = 250;
+    static int cube_size;
+    static flag expanding;
+    static flag direction;
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
+    {
+        cube_size = 0;
+        expanding = 1;
+        direction = 0;
+        Cube.__public_time = get_absolute_time();
+    }
+    if (SCALE_US_TO_MS(absolute_time_diff_us(Cube.__public_time, get_absolute_time())) > expand_time_ms)
+    {
+        if (direction)
+            --cube_size;
+        else
+            ++cube_size;
+
+        if (cube_size >= 2 || cube_size <= 0)
+            direction ^= 1;  
+
+        expanding = 1;
+        Cube.clr_leds();
+        Cube.reset_display_state();
+        Cube.__public_time = get_absolute_time();
+    }
+
+    switch (cube_size)
+    {
+    case 0:
+        if (expanding)
+        {
+            expanding = 0;
+            Cube.add_led(X2, Y2, Z2);
+        }
+        break;
+
+    case 1:
+        if (expanding)
+        {
+            expanding = 0;
+            Cube.add_led(X1, Y1, Z1);
+            Cube.add_led(X1, Y2, Z1);
+            Cube.add_led(X1, Y3, Z1);
+
+            Cube.add_led(X3, Y1, Z1);
+            Cube.add_led(X3, Y2, Z1);
+            Cube.add_led(X3, Y3, Z1);
+
+            Cube.add_led(X2, Y1, Z1);
+            Cube.add_led(X2, Y3, Z1);
+
+            Cube.add_led(X1, Y1, Z3);
+            Cube.add_led(X1, Y2, Z3);
+            Cube.add_led(X1, Y3, Z3);
+
+            Cube.add_led(X3, Y1, Z3);
+            Cube.add_led(X3, Y2, Z3);
+            Cube.add_led(X3, Y3, Z3);
+
+            Cube.add_led(X2, Y1, Z3);
+            Cube.add_led(X2, Y3, Z3);
+
+            Cube.add_led(X3, Y1, Z2);
+            Cube.add_led(X3, Y3, Z2);
+            Cube.add_led(X1, Y1, Z2);
+            Cube.add_led(X1, Y3, Z2);
+        }
+        break;
+
+    case 2:
+        if (expanding)
+        {
+            expanding = 0;
+            Cube.add_led(X0, Y0, Z0);
+            Cube.add_led(X0, Y1, Z0);
+            Cube.add_led(X0, Y2, Z0);
+            Cube.add_led(X0, Y3, Z0);
+            Cube.add_led(X0, Y4, Z0);
+
+            Cube.add_led(X4, Y0, Z0);
+            Cube.add_led(X4, Y1, Z0);
+            Cube.add_led(X4, Y2, Z0);
+            Cube.add_led(X4, Y3, Z0);
+            Cube.add_led(X4, Y4, Z0);
+
+            Cube.add_led(X1, Y0, Z0);
+            Cube.add_led(X2, Y0, Z0);
+            Cube.add_led(X3, Y0, Z0);
+
+            Cube.add_led(X1, Y4, Z0);
+            Cube.add_led(X2, Y4, Z0);
+            Cube.add_led(X3, Y4, Z0);
+
+            Cube.add_led(X0, Y0, Z4);
+            Cube.add_led(X0, Y1, Z4);
+            Cube.add_led(X0, Y2, Z4);
+            Cube.add_led(X0, Y3, Z4);
+            Cube.add_led(X0, Y4, Z4);
+
+            Cube.add_led(X4, Y0, Z4);
+            Cube.add_led(X4, Y1, Z4);
+            Cube.add_led(X4, Y2, Z4);
+            Cube.add_led(X4, Y3, Z4);
+            Cube.add_led(X4, Y4, Z4);
+
+            Cube.add_led(X1, Y0, Z4);
+            Cube.add_led(X2, Y0, Z4);
+            Cube.add_led(X3, Y0, Z4);
+
+            Cube.add_led(X1, Y4, Z4);
+            Cube.add_led(X2, Y4, Z4);
+            Cube.add_led(X3, Y4, Z4);
+
+            Cube.add_led(X0, Y0, Z3);
+            Cube.add_led(X0, Y0, Z2);
+            Cube.add_led(X0, Y0, Z1);
+
+            Cube.add_led(X4, Y0, Z3);
+            Cube.add_led(X4, Y0, Z2);
+            Cube.add_led(X4, Y0, Z1);
+
+            Cube.add_led(X4, Y4, Z3);
+            Cube.add_led(X4, Y4, Z2);
+            Cube.add_led(X4, Y4, Z1);
+
+            Cube.add_led(X0, Y4, Z3);
+            Cube.add_led(X0, Y4, Z2);
+            Cube.add_led(X0, Y4, Z1);
+        }
+        break;
+    
+    default:
+        break;
+    }
+
+    Cube.display();
+
+}
