@@ -58,7 +58,7 @@ uint8_t x_coord = 0;
 #define UART_TX_PIN 0
 #define UART_RX_PIN 1
 
-// #define printf(str) uart_puts(UART_ID, str)
+#define printf(str) uart_puts(UART_ID, (str))
 
 void init_uart()
 {
@@ -69,7 +69,6 @@ void init_uart()
     // Set datasheet for more information on function select
     gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
     gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
-    
 }
 
 void init_leds()
@@ -126,21 +125,13 @@ void init_buttons()
 
 int main()
 {
-    std::srand(std::time(nullptr));
-
-    // Set up our UART with the required speed.
-    uart_init(UART_ID, BAUD_RATE);
-
-    // Set the TX and RX pins by using the function select on the GPIO
-    // Set datasheet for more information on function select
-    gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
-    gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
-
     if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        uart_puts(UART_ID, "[SUCCESS] Succesfull Wi-fucking-Fi module init\n");
+        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
     else
-        uart_puts(UART_ID, "[WARNING] WiFi module NOT INITIALIZED\n");
+        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
+    std::srand(std::time(nullptr));
+    init_uart();
     init_leds();
     init_buttons();
     cube Cube(125);
@@ -227,7 +218,7 @@ int main()
         if (button_select_flag &&
             absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
         {
-            uart_puts(UART_ID, "[INFO] Select button pushed\n");
+            printf("[INFO] Select button pushed\n\r");
             button_select_flag = 0;
             select_mode ^= 1;
             Cube.clr_leds();
@@ -237,7 +228,7 @@ int main()
         /* When Down button pushed first time  */
         if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
         {
-            uart_puts(UART_ID, "[INFO] Down button pushed\n");
+            printf("[INFO] Down button pushed\n\r");
             Cube.clr_leds();
             Cube.reset_display_state();
             --display_number;
@@ -248,7 +239,7 @@ int main()
         /* When UP button pushed first time  */
         else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released && !select_mode)
         {
-            uart_puts(UART_ID, "[INFO] Up button pushed\n");
+            printf("[INFO] Up button pushed\n\r");
             Cube.clr_leds();
             Cube.reset_display_state();
             ++display_number;
