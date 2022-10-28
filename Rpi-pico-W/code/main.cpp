@@ -137,10 +137,10 @@ int main()
     gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 
     if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n");
+        uart_puts(UART_ID, "[SUCCESS] Succesfull Wi-fucking-Fi module init\n");
     else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n");
-    // init_uart();
+        uart_puts(UART_ID, "[WARNING] WiFi module NOT INITIALIZED\n");
+
     init_leds();
     init_buttons();
     cube Cube(125);
@@ -227,7 +227,7 @@ int main()
         if (button_select_flag &&
             absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
         {
-            printf("[INFO] Select button pushed\n");
+            uart_puts(UART_ID, "[INFO] Select button pushed\n");
             button_select_flag = 0;
             select_mode ^= 1;
             Cube.clr_leds();
@@ -237,7 +237,7 @@ int main()
         /* When Down button pushed first time  */
         if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
         {
-            printf("[INFO] Down button pushed\n");
+            uart_puts(UART_ID, "[INFO] Down button pushed\n");
             Cube.clr_leds();
             Cube.reset_display_state();
             --display_number;
@@ -248,7 +248,7 @@ int main()
         /* When UP button pushed first time  */
         else if (gpio_get(BUTTON_UP) == 0 && !button_pushed && !button_released && !select_mode)
         {
-            printf("[INFO] Up button pushed\n");
+            uart_puts(UART_ID, "[INFO] Up button pushed\n");
             Cube.clr_leds();
             Cube.reset_display_state();
             ++display_number;
