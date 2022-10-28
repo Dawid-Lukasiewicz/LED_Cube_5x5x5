@@ -18,7 +18,7 @@ add_executable(main
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
 target_compile_definitions(main PRIVATE PICO_BOARD_DEFINED=pico_wireless)
 
-pico_enable_stdio_usb(main 1)
+pico_enable_stdio_usb(main 0)
 pico_enable_stdio_uart(main 1)
 pico_add_extra_outputs(main)
 
