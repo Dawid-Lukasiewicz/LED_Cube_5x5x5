@@ -11,6 +11,8 @@
 #include "cube.hpp"
 #include "numbers.hpp"
 #include "animations.hpp"
+#include "wifi.hpp"
+#include "password.hpp"
 
 #define SET_X(x) gpio_put((x), 0)
 #define CLEAR_X(x) gpio_put((x), 1)
@@ -28,6 +30,9 @@
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
 
+extern char ssid[];
+extern char pass[];
+flag connected = 0;
 
 extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
@@ -130,10 +135,11 @@ int main()
     else
         printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
-    std::srand(std::time(nullptr));
     init_uart();
     init_leds();
     init_buttons();
+
+    std::srand(std::time(nullptr));
     cube Cube(125);
 
     while(1)
@@ -205,7 +211,23 @@ int main()
         case 9:
             if (!select_mode)
                 nine(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                if (!connected)
+                {
+                    if (connect_to_wifi(ssid, pass))
+                    {
+                        printf("[ERROR] Not connected to: ");
+                    }
+                    else
+                    {
+                        printf("[INFO] Connected to: ");
+                    }
+                    printf(ssid);
+                    printf("\n");
+                    connected = 1;
+                }
+            }
 
             break;
         

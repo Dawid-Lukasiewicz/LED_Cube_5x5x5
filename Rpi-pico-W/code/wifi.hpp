@@ -46,4 +46,6 @@ static err_t tcp_server_accept(void *arg, struct tcp_pcb *client_pcb, err_t err)
 
 static bool tcp_server_open(void *arg);
 
+int connect_to_wifi(char *ssid, char *pass);
+
 #endif

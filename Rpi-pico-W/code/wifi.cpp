@@ -194,3 +194,9 @@ static bool tcp_server_open(void *arg)
 
     return true;
 }
+
+int connect_to_wifi(char *ssid, char *pass)
+{
+    cyw43_arch_enable_sta_mode();
+    return cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000);
+}
