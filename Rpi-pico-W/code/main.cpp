@@ -130,17 +130,18 @@ void init_buttons()
 
 int main()
 {
-    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
-
+    std::srand(std::time(nullptr));
     init_uart();
     init_leds();
     init_buttons();
 
     std::srand(std::time(nullptr));
     cube Cube(125);
+
+    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
+        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
+    else
+        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
     while(1)
     {
