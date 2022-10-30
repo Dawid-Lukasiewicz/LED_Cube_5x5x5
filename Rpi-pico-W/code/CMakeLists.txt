@@ -13,6 +13,7 @@ add_executable(main
             led.cpp
             numbers.cpp
             animations.cpp
+            wifi.cpp
 )
 
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
