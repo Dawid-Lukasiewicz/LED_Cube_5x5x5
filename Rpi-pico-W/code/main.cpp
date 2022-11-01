@@ -11,8 +11,21 @@
 #include "cube.hpp"
 #include "numbers.hpp"
 #include "animations.hpp"
-#include "wifi.hpp"
-#include "password.hpp"
+// #include "wifi.hpp"
+// #include "password.hpp"
+
+#include "FreeRTOS.h"
+#include "task.h"
+
+#define WIFI_INITIALIZE_TASK_PRIORITY (tskIDLE_PRIORITY + 1UL)
+
+static void wifi_initialize()
+{
+    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
+        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
+    else
+        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
+}
 
 #define SET_X(x) gpio_put((x), 0)
 #define CLEAR_X(x) gpio_put((x), 1)
@@ -54,27 +67,6 @@ int8_t display_number = 0;
 absolute_time_t number_display_start = get_absolute_time();
 
 uint8_t x_coord = 0;
-
-#define UART_ID uart0
-#define BAUD_RATE 115200
-
-// We are using pins 0 and 1, but see the GPIO function select table in the
-// datasheet for information on which other pins can be used.
-#define UART_TX_PIN 0
-#define UART_RX_PIN 1
-
-#define printf(str) uart_puts(UART_ID, (str))
-
-void init_uart()
-{
-    // Set up our UART with the required speed.
-    uart_init(UART_ID, BAUD_RATE);
-
-    // Set the TX and RX pins by using the function select on the GPIO
-    // Set datasheet for more information on function select
-    gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
-    gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
-}
 
 void init_leds()
 {
@@ -131,17 +123,20 @@ void init_buttons()
 int main()
 {
     std::srand(std::time(nullptr));
-    init_uart();
+    stdio_init_all();
     init_leds();
     init_buttons();
 
     std::srand(std::time(nullptr));
     cube Cube(125);
 
-    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
+    TaskHandle_t task;
+    xTaskCreate((TaskFunction_t)wifi_initialize, "wifi_initialize", configMINIMAL_STACK_SIZE, NULL, WIFI_INITIALIZE_TASK_PRIORITY, &task);
+    vTaskStartScheduler();
+    // if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
+    //     printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
+    // else
+    //     printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
     while(1)
     {
@@ -216,16 +211,7 @@ int main()
             {
                 if (!connected)
                 {
-                    if (connect_to_wifi(ssid, pass))
-                    {
-                        printf("[ERROR] Not connected to: ");
-                    }
-                    else
-                    {
-                        printf("[INFO] Connected to: ");
-                    }
-                    printf(ssid);
-                    printf("\n");
+                    printf("Connecting...\n");
                     connected = 1;
                 }
             }
