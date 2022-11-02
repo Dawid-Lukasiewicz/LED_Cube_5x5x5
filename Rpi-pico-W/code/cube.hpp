@@ -3,8 +3,12 @@
 
 #include <vector>
 // #include <memory>
-
 #include "pico/stdlib.h"
+
+/* FreeRTOS library*/
+#include "FreeRTOS.h"
+// #include "task.h"
+#include "queue.h"
 
 #include "led.hpp"
 
@@ -13,6 +17,7 @@ typedef uint8_t flag;
 #define MAX_LEDS_X 5
 #define MAX_LEDS_Y 5
 #define MAX_LEDS_Z 5
+#define MAX_LED_AMOUNT 125
 
 #define X0 15U
 #define X1 13U
@@ -31,6 +36,7 @@ typedef uint8_t flag;
 #define Z2 22U
 #define Z3 21U
 #define Z4 20U
+
 
 const uint8_t X_table[5] = {X0, X1, X2, X3, X4};
 const uint8_t Y_table[5] = {Y0, Y1, Y2, Y3, Y4};
@@ -60,7 +66,7 @@ private:
 public:
     std::vector<led> __leds;
     absolute_time_t __public_time;
-    flag __pattern_change = 0;
+    QueueHandle_t xCubeQueue = NULL; 
 
     cube(/* args */);
     cube(uint32_t size);

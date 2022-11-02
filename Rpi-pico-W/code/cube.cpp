@@ -1,5 +1,5 @@
 #include "cube.hpp"
-
+#include <stdio.h>
 
 cube::cube() {}
 
@@ -51,13 +51,24 @@ void cube::clr_leds()
         __leds[i].__off();
     }   
     __leds.clear();
-    __pattern_change = 1;
 }
 
 void cube::display()
 {
     if (__display_state == 0)
     {
+        // if (xCubeQueue != NULL)
+        // {
+        //     int tmp_led = __leds.size();
+        //     for (int i = 0; i < __leds.size(); i++)
+        //     {
+        //         // xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+        //         if (xQueueSend(xCubeQueue, (void*)&tmp_led, 0) != pdTRUE)
+        //             printf("Cant put variable\r\n");
+        //         else
+        //             printf("Variable put %d\r\n", tmp_led);
+        //     }
+        // }
         __display_state = 1;
         __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
@@ -134,7 +145,6 @@ void cube::change_X(uint8_t x)
         __leds.at(i).__off();
         __leds.at(i).__x = x;
     }
-    __pattern_change = 1;
 }
 
 void cube::change_Y(uint8_t y)
@@ -144,7 +154,6 @@ void cube::change_Y(uint8_t y)
         __leds.at(i).__off();
         __leds.at(i).__y = y;
     }
-    __pattern_change = 1;
 }
 
 void cube::change_Z(uint8_t z)
@@ -154,7 +163,6 @@ void cube::change_Z(uint8_t z)
         __leds.at(i).__off();
         __leds.at(i).__z = z;
     }
-    __pattern_change = 1;
 }
 
 flag cube::get_display_state()

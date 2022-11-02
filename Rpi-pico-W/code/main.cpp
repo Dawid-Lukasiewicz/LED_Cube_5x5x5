@@ -40,7 +40,6 @@
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
 
-
 flag connected = 0;
 
 extern const uint8_t X_table[5];
@@ -110,6 +109,44 @@ void init_buttons()
     // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_LEVEL_LOW, 1, button_select_callback);
 }
 
+void send_to_queue(cube &Cube)
+{   
+    uint uIValueToSend = 0;
+
+    if (Cube.xCubeQueue != NULL)
+        printf("In send: Hanlder is not NULL\r\n");
+    else
+        printf("In send: Hanlder is not NULL\r\n");
+    while (true) {
+        uIValueToSend = 1;
+        xQueueSend(Cube.xCubeQueue, &uIValueToSend, 0U);
+        vTaskDelay(100);
+
+        uIValueToSend = 0;
+        xQueueSend(Cube.xCubeQueue, &uIValueToSend, 0U);
+        vTaskDelay(100);
+    }
+}
+
+// void receive_from_queue()
+// {
+//     uint uIReceivedValue;
+
+//     while(1)
+//     {
+//         xQueueReceive(xCubeQueue, &uIReceivedValue, portMAX_DELAY);
+
+//         if(uIReceivedValue == 1){
+//             // send_message(conn_sock, "LED is ON! \n");
+//             printf("LED is ON! \n");
+//         }
+//         if(uIReceivedValue == 0){
+//             // send_message(conn_sock, "LED is OFF! \n");
+//             printf("LED is OFF! \n");
+//         }
+//     }
+// }
+
 static void main_thread()
 {
     std::srand(std::time(nullptr));
@@ -118,12 +155,18 @@ static void main_thread()
     init_buttons();
 
     std::srand(std::time(nullptr));
-    cube Cube(125);
+    cube Cube(MAX_LED_AMOUNT);
+    Cube.xCubeQueue = xQueueCreate(1, sizeof(int));
 
     if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
         printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
     else
         printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
+
+    if (Cube.xCubeQueue != NULL)
+        printf("In main: Hanlder is not NULL\r\n");
+    else
+        printf("In main: Hanlder is not NULL\r\n");
 
     while(1)
     {
@@ -203,7 +246,10 @@ static void main_thread()
                     vTaskDelay(7500);
                     if (connected)
                     {
-                        xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 3, NULL);
+                        // xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
+                        // xCubeQueue = xQueueCreate(1, sizeof(int));
+                        xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
+                        xTaskCreate((TaskFunction_t)send_to_queue, "SendToQueue", configMINIMAL_STACK_SIZE, (void*)&Cube, 3, NULL);
                     }
                 }
             }
@@ -289,5 +335,6 @@ int main()
 {
     TaskHandle_t task;
     xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*10, NULL, 1, &task);
+    // xTaskCreate((TaskFunction_t)receive_from_queue, "ReceiveToQueue", configMINIMAL_STACK_SIZE, NULL, 3, NULL);
     vTaskStartScheduler();
 }

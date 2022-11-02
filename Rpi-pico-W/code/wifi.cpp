@@ -20,47 +20,46 @@ void send_message(int socket, char *msg)
 int handle_single_led_pattern(int conn_sock, cube &Cube)
 {
     // char buffer[128];
-    // while (!Cube.__pattern_change)
-    // {}
-    // Cube.__pattern_change = 0;
+    // led ReceivedLed;
+    int ReceivedLed;
     std::string buffer;
-    int done = 0;
     int led_count = 0;
-
-    send_message(conn_sock, "led index: |");
-    while (led_count < Cube.__leds.size())
+    while (1)
     {
-        // buffer = reinterpret_cast<char*>(led_count);
-        buffer = std::to_string(led_count);
-        char *buffer_c = (char*)buffer.c_str();
-        send_message(conn_sock, buffer_c);
-        send_message(conn_sock, "| ");
-
-        // send_message(conn_sock, "coords: X=");
-        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__x);
-        // send_message(conn_sock, buffer);
-
-        // send_message(conn_sock, "Y=");
-        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__y);
-        // send_message(conn_sock, buffer);
-
-        // send_message(conn_sock, "Z=");
-        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__z);
-        // send_message(conn_sock, buffer);
-
+        // xQueueReceive(xCubeQueue, &ReceivedLed, portMAX_DELAY);
+        // send_message(conn_sock, "led: x=");
+        // // buffer = std::to_string(ReceivedLed.__x);
+        // buffer = std::to_string(ReceivedLed);
+        // char *buffer_c = (char*)buffer.c_str();
+        // send_message(conn_sock, buffer_c);
         // send_message(conn_sock, "\r\n");
-
-        led_count++;
+        vTaskDelay(1000);
     }
-    send_message(conn_sock, "\r\n");
-    vTaskDelay(500);
     return 0;
 }
 
 void handle_connection(int conn_sock, cube &Cube)
 {
-    while (!handle_single_led_pattern(conn_sock, Cube))
-    {}
+    uint uIReceivedValue;
+
+    while(1)
+    {
+        if (Cube.xCubeQueue != NULL)
+        {
+            xQueueReceive(Cube.xCubeQueue, &uIReceivedValue, portMAX_DELAY);
+            if(uIReceivedValue == 1){
+                send_message(conn_sock, "LED is ON! \n");
+            }
+            if(uIReceivedValue == 0){
+                send_message(conn_sock, "LED is OFF! \n");
+            }
+        }
+        else
+        {
+            printf("Queue handler is NULL\r\n");
+        }
+        vTaskDelay(500);
+    }
 
     closesocket(conn_sock);
 }

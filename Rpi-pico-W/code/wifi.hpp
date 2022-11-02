@@ -10,6 +10,7 @@
 /* FreeRTOS library*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 /* lwip library */
 #include "lwip/apps/lwiperf.h"
