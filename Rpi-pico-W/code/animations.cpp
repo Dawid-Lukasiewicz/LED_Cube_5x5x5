@@ -23,6 +23,7 @@ void random_led(cube &Cube)
     Cube.display(500);
 }
 
+/* need to fix in order to cooperate with queue better */
 void rain(cube &Cube)
 {
     static int8_t z;
@@ -56,6 +57,7 @@ void rain(cube &Cube)
         Cube.display();
 }
 
+/* need to fix in order to cooperate with queue better */
 void heavy_rain(cube &Cube)
 {
 
@@ -108,7 +110,7 @@ void heavy_rain(cube &Cube)
 
 void expanding_cube(cube &Cube)
 {
-    int expand_time_ms = 250;
+    int expand_time_ms = 500;
     static int cube_size;
     static flag expanding;
     static flag direction;

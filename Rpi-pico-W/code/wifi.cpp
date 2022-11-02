@@ -18,47 +18,40 @@ void send_message(int socket, char *msg)
 }
 
 int handle_single_led_pattern(int conn_sock, cube &Cube)
-{
-    // char buffer[128];
-    // led ReceivedLed;
-    int ReceivedLed;
-    std::string buffer;
-    int led_count = 0;
-    while (1)
-    {
-        // xQueueReceive(xCubeQueue, &ReceivedLed, portMAX_DELAY);
-        // send_message(conn_sock, "led: x=");
-        // // buffer = std::to_string(ReceivedLed.__x);
-        // buffer = std::to_string(ReceivedLed);
-        // char *buffer_c = (char*)buffer.c_str();
-        // send_message(conn_sock, buffer_c);
-        // send_message(conn_sock, "\r\n");
-        vTaskDelay(1000);
-    }
-    return 0;
-}
+{}
 
 void handle_connection(int conn_sock, cube &Cube)
 {
-    uint uIReceivedValue;
-
+    led received_led;
+    std::string str_buff;
     while(1)
     {
         if (Cube.xCubeQueue != NULL)
         {
-            xQueueReceive(Cube.xCubeQueue, &uIReceivedValue, portMAX_DELAY);
-            if(uIReceivedValue == 1){
-                send_message(conn_sock, "LED is ON! \n");
-            }
-            if(uIReceivedValue == 0){
-                send_message(conn_sock, "LED is OFF! \n");
-            }
+            xQueueReceive(Cube.xCubeQueue, &received_led, portMAX_DELAY);
+
+            str_buff = std::to_string(received_led.__x);
+            char *char_buff = (char*)str_buff.c_str();
+            send_message(conn_sock, "X= ");
+            send_message(conn_sock, char_buff);
+
+            str_buff = std::to_string(received_led.__y);
+            char_buff = (char*)str_buff.c_str();
+            send_message(conn_sock, " Y= ");
+            send_message(conn_sock, char_buff);
+
+            str_buff = std::to_string(received_led.__z);
+            char_buff = (char*)str_buff.c_str();
+            send_message(conn_sock, " Z= ");
+            send_message(conn_sock, char_buff);
+
+            send_message(conn_sock, "\r\n");
         }
         else
         {
             printf("Queue handler is NULL\r\n");
         }
-        vTaskDelay(500);
+        // vTaskDelay(500);
     }
 
     closesocket(conn_sock);

@@ -128,25 +128,6 @@ void send_to_queue(cube &Cube)
     }
 }
 
-// void receive_from_queue()
-// {
-//     uint uIReceivedValue;
-
-//     while(1)
-//     {
-//         xQueueReceive(xCubeQueue, &uIReceivedValue, portMAX_DELAY);
-
-//         if(uIReceivedValue == 1){
-//             // send_message(conn_sock, "LED is ON! \n");
-//             printf("LED is ON! \n");
-//         }
-//         if(uIReceivedValue == 0){
-//             // send_message(conn_sock, "LED is OFF! \n");
-//             printf("LED is OFF! \n");
-//         }
-//     }
-// }
-
 static void main_thread()
 {
     std::srand(std::time(nullptr));
@@ -156,7 +137,8 @@ static void main_thread()
 
     std::srand(std::time(nullptr));
     cube Cube(MAX_LED_AMOUNT);
-    Cube.xCubeQueue = xQueueCreate(1, sizeof(int));
+    // Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(int));
+    Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
 
     if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
         printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
@@ -246,10 +228,7 @@ static void main_thread()
                     vTaskDelay(7500);
                     if (connected)
                     {
-                        // xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
-                        // xCubeQueue = xQueueCreate(1, sizeof(int));
                         xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
-                        xTaskCreate((TaskFunction_t)send_to_queue, "SendToQueue", configMINIMAL_STACK_SIZE, (void*)&Cube, 3, NULL);
                     }
                 }
             }
