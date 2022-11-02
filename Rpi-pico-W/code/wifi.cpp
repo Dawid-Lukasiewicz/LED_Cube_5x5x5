@@ -27,16 +27,19 @@ void handle_connection(int conn_sock, cube &Cube)
         {
             xQueueReceive(Cube.xCubeQueue, &received_led, portMAX_DELAY);
 
+            /* Send X coordinate*/
             str_buff = std::to_string(received_led.__x);
             char *char_buff = (char*)str_buff.c_str();
             send_message(conn_sock, "X= ");
             send_message(conn_sock, char_buff);
 
+            /* Send Y coordinate*/
             str_buff = std::to_string(received_led.__y);
             char_buff = (char*)str_buff.c_str();
             send_message(conn_sock, " Y= ");
             send_message(conn_sock, char_buff);
 
+            /* Send Z coordinate*/
             str_buff = std::to_string(received_led.__z);
             char_buff = (char*)str_buff.c_str();
             send_message(conn_sock, " Z= ");
@@ -52,10 +55,7 @@ void handle_connection(int conn_sock, cube &Cube)
         {
             send_message(conn_sock, "-------------------------\r\n");
         }
-        
-        // vTaskDelay(500);
     }
-
     closesocket(conn_sock);
 }
 
@@ -105,14 +105,6 @@ void run_server(cube &Cube)
     vTaskDelete(NULL);
 }
 
-void wifi_initialize()
-{
-    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
-}
-
 void wifi_connect(flag &success)
 {
     cyw43_arch_enable_sta_mode();
@@ -139,7 +131,5 @@ void wifi_connect(flag &success)
         printf("Cannot connect\n");
         success = 0;
     }
-    // run_server();
-    // cyw43_arch_deinit();
     vTaskDelete(NULL);
 }

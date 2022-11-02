@@ -105,8 +105,6 @@ void init_buttons()
     gpio_init(BUTTON_SELECT);
     gpio_set_dir(BUTTON_SELECT, GPIO_IN);
     gpio_pull_up(BUTTON_SELECT);
-    // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_EDGE_FALL, 1, button_select_callback);
-    // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_LEVEL_LOW, 1, button_select_callback);
 }
 
 void send_to_queue(cube &Cube)
@@ -137,18 +135,12 @@ static void main_thread()
 
     std::srand(std::time(nullptr));
     cube Cube(MAX_LED_AMOUNT);
-    // Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(int));
     Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
 
     if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
         printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
     else
         printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
-
-    if (Cube.xCubeQueue != NULL)
-        printf("In main: Hanlder is not NULL\r\n");
-    else
-        printf("In main: Hanlder is not NULL\r\n");
 
     while(1)
     {
@@ -225,6 +217,7 @@ static void main_thread()
                 {
                     TaskHandle_t task2;
                     xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&connected, 1, &task2);
+                    /* Instead of Delay try to make notification wait */
                     vTaskDelay(7500);
                     if (connected)
                     {
@@ -307,13 +300,12 @@ static void main_thread()
         
         
     }
-    // return 0;
+    vTaskDelete(NULL);
 }
 
 int main()
 {
     TaskHandle_t task;
     xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*10, NULL, 1, &task);
-    // xTaskCreate((TaskFunction_t)receive_from_queue, "ReceiveToQueue", configMINIMAL_STACK_SIZE, NULL, 3, NULL);
     vTaskStartScheduler();
 }
