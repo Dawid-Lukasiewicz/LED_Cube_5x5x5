@@ -10,7 +10,6 @@ void send_message(int socket, char *msg)
     int send = 0;
     while (done < len)
     {
-        printf("Sending %d\n", ++send);
         int done_now = send(socket, msg + done, len - done, 0);
         if (done_now <= 0)
             return;
@@ -18,52 +17,52 @@ void send_message(int socket, char *msg)
     }
 }
 
-int handle_single_command(int conn_sock)
+int handle_single_led_pattern(int conn_sock, cube &Cube)
 {
-    char buffer[128];
+    // char buffer[128];
+    std::string buffer;
     int done = 0;
-    send_message(conn_sock, "Enter command: ");
+    int led_count = 0;
 
-    while (done < sizeof(buffer))
+    send_message(conn_sock, "led index: |");
+    while (led_count < Cube.__leds.size())
     {
-        int done_now = recv(conn_sock, buffer + done, sizeof(buffer) - done, 0);
-        if (done_now <= 0)
-            return -1;
-        done += done_now;
-        char *end = strnstr(buffer, "\r", done);
-        if (!end)
-            continue;
-        *end = 0;
+        // buffer = reinterpret_cast<char*>(led_count);
+        buffer = std::to_string(led_count);
+        char *buffer_c = (char*)buffer.c_str();
+        send_message(conn_sock, buffer_c);
+        send_message(conn_sock, "| ");
 
-        if (!strcmp(buffer, "on"))
-        {
-            cyw43_arch_gpio_put(0, true);
-            send_message(conn_sock, "The LED is now on\r\n");
-        }
-        else if (!strcmp(buffer, "off"))
-        {
-            cyw43_arch_gpio_put(0, false);
-            send_message(conn_sock, "The LED is now off\r\n");
-        }
-        else
-        {
-            send_message(conn_sock, "Unknown command\r\n");
-        }
-        break;
+        // send_message(conn_sock, "coords: X=");
+        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__x);
+        // send_message(conn_sock, buffer);
+
+        // send_message(conn_sock, "Y=");
+        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__y);
+        // send_message(conn_sock, buffer);
+
+        // send_message(conn_sock, "Z=");
+        // buffer = reinterpret_cast<char*>(Cube.__leds[led_count].__z);
+        // send_message(conn_sock, buffer);
+
+        // send_message(conn_sock, "\r\n");
+
+        led_count++;
     }
-
+    send_message(conn_sock, "| \r\n");
+    vTaskDelay(200);
     return 0;
 }
 
-void handle_connection(int conn_sock)
+void handle_connection(int conn_sock, cube &Cube)
 {
-    while (!handle_single_command(conn_sock))
+    while (!handle_single_led_pattern(conn_sock, Cube))
     {}
 
     closesocket(conn_sock);
 }
 
-void run_server()
+void run_server(cube &Cube)
 {
     int server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     struct sockaddr_in listen_addr =
@@ -104,8 +103,9 @@ void run_server()
             printf("Unable to accept incoming connection: error %d\n", errno);
             return;
         }
-        handle_connection(conn_sock);
+        handle_connection(conn_sock, Cube);
     }
+    vTaskDelete(NULL);
 }
 
 void wifi_initialize()
@@ -142,7 +142,7 @@ void wifi_connect(flag &success)
         printf("Cannot connect\n");
         success = 0;
     }
-    run_server();
-    cyw43_arch_deinit();
+    // run_server();
+    // cyw43_arch_deinit();
     vTaskDelete(NULL);
 }

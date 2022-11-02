@@ -92,12 +92,6 @@ void init_leds()
     }
 }
 
-void button_select_callback(uint gpio, uint32_t event)
-{
-    button_select_flag = 1;
-    pushed_start = get_absolute_time();
-}
-
 void init_buttons()
 {
     gpio_init(BUTTON_UP);
@@ -112,7 +106,7 @@ void init_buttons()
     gpio_init(BUTTON_SELECT);
     gpio_set_dir(BUTTON_SELECT, GPIO_IN);
     gpio_pull_up(BUTTON_SELECT);
-    gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_EDGE_FALL, 1, button_select_callback);
+    // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_EDGE_FALL, 1, button_select_callback);
     // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_LEVEL_LOW, 1, button_select_callback);
 }
 
@@ -207,6 +201,10 @@ static void main_thread()
                     TaskHandle_t task2;
                     xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&connected, 1, &task2);
                     vTaskDelay(7500);
+                    if (connected)
+                    {
+                        xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 3, NULL);
+                    }
                 }
             }
             break;
@@ -215,16 +213,15 @@ static void main_thread()
             display_number = 0;
             break;
         }
-
-        /* Select button debounce */
-        if (button_select_flag &&
-            absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
+        if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
-            button_select_flag = 0;
-            select_mode ^= 1;
             Cube.clr_leds();
             Cube.reset_display_state();
+            select_mode ^= 1;
+            button_pushed = 1;
+            button_pushed_once = 1;
+            pushed_start = get_absolute_time();
         }
 
         /* When Down button pushed first time  */
@@ -253,8 +250,7 @@ static void main_thread()
         else if ( (gpio_get(BUTTON_UP) == 1 &&
                 gpio_get(BUTTON_DOWN) == 1 &&
                 button_pushed == 1 ) &&
-                absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME &&
-                !select_mode)
+                absolute_time_diff_us(pushed_start, get_absolute_time()) >= DEBOUNCE_TIME)
         {
             button_pushed = 0;
             button_released = 1;

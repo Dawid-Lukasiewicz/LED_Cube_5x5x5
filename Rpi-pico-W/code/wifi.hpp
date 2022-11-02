@@ -1,6 +1,8 @@
 #ifndef WIFI
 #define WIFI
 
+#include <string>
+
 /* pico-sdk standard*/
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
@@ -21,7 +23,7 @@
 void send_message(int socket, char *msg);
 int handle_single_command(int conn_sock);
 void handle_connection(int conn_sock);
-void run_server();
+void run_server(cube &Cube);
 
 void wifi_initialize();
 void wifi_connect(flag &success);
