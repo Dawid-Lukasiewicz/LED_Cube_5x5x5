@@ -17,9 +17,6 @@ void send_message(int socket, char *msg)
     }
 }
 
-int handle_single_led_pattern(int conn_sock, cube &Cube)
-{}
-
 void handle_connection(int conn_sock, cube &Cube)
 {
     led received_led;
@@ -51,6 +48,11 @@ void handle_connection(int conn_sock, cube &Cube)
         {
             printf("Queue handler is NULL\r\n");
         }
+        if (!uxQueueMessagesWaiting(Cube.xCubeQueue))
+        {
+            send_message(conn_sock, "-------------------------\r\n");
+        }
+        
         // vTaskDelay(500);
     }
 
