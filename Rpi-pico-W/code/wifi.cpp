@@ -20,6 +20,9 @@ void send_message(int socket, char *msg)
 int handle_single_led_pattern(int conn_sock, cube &Cube)
 {
     // char buffer[128];
+    // while (!Cube.__pattern_change)
+    // {}
+    // Cube.__pattern_change = 0;
     std::string buffer;
     int done = 0;
     int led_count = 0;
@@ -49,8 +52,8 @@ int handle_single_led_pattern(int conn_sock, cube &Cube)
 
         led_count++;
     }
-    send_message(conn_sock, "| \r\n");
-    vTaskDelay(200);
+    send_message(conn_sock, "\r\n");
+    vTaskDelay(500);
     return 0;
 }
 

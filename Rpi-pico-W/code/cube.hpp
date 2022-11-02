@@ -60,6 +60,7 @@ private:
 public:
     std::vector<led> __leds;
     absolute_time_t __public_time;
+    flag __pattern_change = 0;
 
     cube(/* args */);
     cube(uint32_t size);

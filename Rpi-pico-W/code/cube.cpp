@@ -51,6 +51,7 @@ void cube::clr_leds()
         __leds[i].__off();
     }   
     __leds.clear();
+    __pattern_change = 1;
 }
 
 void cube::display()
@@ -133,6 +134,7 @@ void cube::change_X(uint8_t x)
         __leds.at(i).__off();
         __leds.at(i).__x = x;
     }
+    __pattern_change = 1;
 }
 
 void cube::change_Y(uint8_t y)
@@ -142,6 +144,7 @@ void cube::change_Y(uint8_t y)
         __leds.at(i).__off();
         __leds.at(i).__y = y;
     }
+    __pattern_change = 1;
 }
 
 void cube::change_Z(uint8_t z)
@@ -151,6 +154,7 @@ void cube::change_Z(uint8_t z)
         __leds.at(i).__off();
         __leds.at(i).__z = z;
     }
+    __pattern_change = 1;
 }
 
 flag cube::get_display_state()
