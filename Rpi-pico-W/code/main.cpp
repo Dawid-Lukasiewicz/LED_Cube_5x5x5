@@ -11,21 +11,18 @@
 #include "cube.hpp"
 #include "numbers.hpp"
 #include "animations.hpp"
-// #include "wifi.hpp"
-// #include "password.hpp"
+#include "wifi.hpp"
+#include "password.hpp"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define WIFI_INITIALIZE_TASK_PRIORITY (tskIDLE_PRIORITY + 1UL)
+#ifndef RUN_FREERTOS_ON_CORE
+    #define RUN_FREERTOS_ON_CORE 1
+#endif
 
-static void wifi_initialize()
-{
-    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
-}
+#define WIFI_INITIALIZE_TASK_PRIORITY (tskIDLE_PRIORITY + 1UL)
+#define MAIN_TASK_PRIORITY (tskIDLE_PRIORITY)
 
 #define SET_X(x) gpio_put((x), 0)
 #define CLEAR_X(x) gpio_put((x), 1)
@@ -43,8 +40,7 @@ static void wifi_initialize()
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
 
-extern char ssid[];
-extern char pass[];
+
 flag connected = 0;
 
 extern const uint8_t X_table[5];
@@ -120,7 +116,7 @@ void init_buttons()
     // gpio_set_irq_enabled_with_callback(BUTTON_SELECT, GPIO_IRQ_LEVEL_LOW, 1, button_select_callback);
 }
 
-int main()
+static void main_thread()
 {
     std::srand(std::time(nullptr));
     stdio_init_all();
@@ -130,13 +126,10 @@ int main()
     std::srand(std::time(nullptr));
     cube Cube(125);
 
-    TaskHandle_t task;
-    xTaskCreate((TaskFunction_t)wifi_initialize, "wifi_initialize", configMINIMAL_STACK_SIZE, NULL, WIFI_INITIALIZE_TASK_PRIORITY, &task);
-    vTaskStartScheduler();
-    // if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-    //     printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    // else
-    //     printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
+    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
+        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
+    else
+        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
     while(1)
     {
@@ -211,11 +204,11 @@ int main()
             {
                 if (!connected)
                 {
-                    printf("Connecting...\n");
-                    connected = 1;
+                    TaskHandle_t task2;
+                    xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&connected, 1, &task2);
+                    vTaskDelay(7500);
                 }
             }
-
             break;
         
         default:
@@ -293,6 +286,12 @@ int main()
         
         
     }
-    
-    return 0;
+    // return 0;
+}
+
+int main()
+{
+    TaskHandle_t task;
+    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*10, NULL, 1, &task);
+    vTaskStartScheduler();
 }
