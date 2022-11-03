@@ -33,7 +33,7 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-#define NUMBER_DISPLAY_TIME     SCALE_S_TO_US(1)
+#define NUMBER_DISPLAY_TIME     SCALE_MS_TO_US(250)
 #define DEBOUNCE_TIME           SCALE_MS_TO_US(50)
 
 #define BUTTON_UP               7U
@@ -66,10 +66,10 @@ uint8_t x_coord = 0;
 void init_leds()
 {
     #ifdef pico_wireless
-        gpio_init(CYW43_WL_GPIO_LED_PIN);
-        gpio_set_dir(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
-        gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        // cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+        // gpio_init(CYW43_WL_GPIO_LED_PIN);
+        // gpio_set_dir(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
+        // gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, GPIO_OUT);
     #else
         gpio_init(25U);
         gpio_set_dir(25U, GPIO_OUT);
@@ -130,6 +130,10 @@ static void main_thread()
 {
     std::srand(std::time(nullptr));
     stdio_init_all();
+    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
+        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
+    else
+        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
     init_leds();
     init_buttons();
 
@@ -137,10 +141,6 @@ static void main_thread()
     cube Cube(MAX_LED_AMOUNT);
     Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
 
-    if (!cyw43_arch_init_with_country(uint32_t CYW43_COUNTRY_POLAND))
-        printf("[SUCCESS] Succesfull Wi-fucking-Fi module init\n\r");
-    else
-        printf("[WARNING] WiFi module NOT INITIALIZED\n\r");
 
     while(1)
     {
@@ -280,7 +280,6 @@ static void main_thread()
             button_released = 0;
         }
         
-
         /* Incrementing display number's X position */
         if (button_pushed_once ||
             (!button_pushed) &&

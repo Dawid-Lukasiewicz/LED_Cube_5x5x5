@@ -23,7 +23,6 @@ void random_led(cube &Cube)
     Cube.display(500);
 }
 
-/* need to fix in order to cooperate with queue better */
 void rain(cube &Cube)
 {
     static int8_t x;
@@ -62,13 +61,12 @@ void rain(cube &Cube)
         Cube.display();
 }
 
-/* need to fix in order to cooperate with queue better */
 void heavy_rain(cube &Cube)
 {
 
     static flag another_drop;
-    uint rain_time_drop_ms = 75;
-    const uint8_t drop_number = 10;
+    uint rain_time_drop_ms = 50;
+    const uint8_t drop_number = 8;
 
     static led Drops[drop_number];
 
@@ -89,23 +87,20 @@ void heavy_rain(cube &Cube)
     }
     else if (SCALE_US_TO_MS(absolute_time_diff_us(Cube.__public_time, get_absolute_time())) > rain_time_drop_ms)
     {
+        Cube.clr_leds();
+        Cube.reset_display_state();
         for (int i = 0; i < drop_number; i++)
         {
             --Drops[i].__z;
             if (Drops[i].__z < 0)
             {
-                int8_t x = rand() % MAX_LEDS_X;
-                int8_t y = rand() % MAX_LEDS_Y;
-                Drops[i].__x = x;
-                Drops[i].__y = y;
+                Drops[i].__x = rand() % MAX_LEDS_X;
+                Drops[i].__y = rand() % MAX_LEDS_Y;
                 Drops[i].__z = 4;
-                Cube.emplace_led(i, X_table[x], Y_table[y], Z_table[Drops[i].__z]);
             }
-            else
-            {
-                Cube.__leds[i].__off();
-                Cube.__leds[i].__z = Z_table[Drops[i].__z];
-            }
+            Cube.add_led(X_table[Drops[i].__x],
+                        Y_table[Drops[i].__y],
+                        Z_table[Drops[i].__z]);
         }
         Cube.__public_time = get_absolute_time();
     }
@@ -115,7 +110,7 @@ void heavy_rain(cube &Cube)
 
 void expanding_cube(cube &Cube)
 {
-    int expand_time_ms = 500;
+    int expand_time_ms = 150;
     static int cube_size;
     static flag expanding;
     static flag direction;
