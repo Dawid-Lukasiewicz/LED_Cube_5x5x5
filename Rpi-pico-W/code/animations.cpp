@@ -26,19 +26,22 @@ void random_led(cube &Cube)
 /* need to fix in order to cooperate with queue better */
 void rain(cube &Cube)
 {
+    static int8_t x;
+    static int8_t y;
     static int8_t z;
     static flag another_drop;
-    uint rain_time_drop_ms = 100;
+    uint rain_time_drop_ms = 50;
     if (Cube.get_display_state() == DISPLAY_STATE_INIT 
         || another_drop)
     {
+        z = 4;
         another_drop = 0;
 
-        Cube.clr_leds();
-        z = 4;
-        uint8_t x = std::rand() % MAX_LEDS_X;
-        uint8_t y = std::rand() % MAX_LEDS_Y;
+        x = std::rand() % MAX_LEDS_X;
+        y = std::rand() % MAX_LEDS_Y;
 
+        Cube.clr_leds();
+        Cube.reset_display_state();
         Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
         Cube.__public_time = get_absolute_time();
     }
@@ -49,7 +52,9 @@ void rain(cube &Cube)
             another_drop = 1;
         else
         {
-            Cube.change_Z(Z_table[z]);
+            Cube.clr_leds();
+            Cube.reset_display_state();
+            Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
             Cube.__public_time = get_absolute_time();
         }
     }
