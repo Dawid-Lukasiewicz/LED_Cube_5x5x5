@@ -181,7 +181,10 @@ static void main_thread()
         case 4:
             if (!select_mode)
                 four(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                expanding_star(Cube);
+            }
 
             break;
         case 5:

@@ -249,3 +249,150 @@ void expanding_cube(cube &Cube)
     Cube.display();
 
 }
+
+void expanding_star(cube &Cube)
+{
+    int expand_time_ms = 150;
+    static int star_size;
+    static flag change;
+    static flag growing;
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
+    {
+        star_size = 0;
+        change = 1;
+        Cube.__public_time = get_absolute_time();
+    }
+    if (SCALE_US_TO_MS(absolute_time_diff_us(Cube.__public_time, get_absolute_time())) > expand_time_ms)
+    {
+        change = 1;
+    }
+
+    switch (star_size)
+    {
+    case 0:
+        if (change)
+        {
+            change = 0;
+            star_size++;
+
+            Cube.clr_leds();
+            Cube.reset_display_state();
+
+            Cube.add_led(X2, Y2, Z2);
+
+            Cube.__public_time = get_absolute_time();
+        }
+        break;
+    case 1:
+        if (change)
+        {
+            change = 0;
+            star_size++;
+            // Cube.clr_leds();
+            Cube.reset_display_state();
+
+            Cube.add_led(X3, Y3, Z3);
+            Cube.add_led(X3, Y3, Z1);
+
+            Cube.add_led(X3, Y1, Z3);
+            Cube.add_led(X3, Y1, Z1);
+            
+            Cube.add_led(X1, Y3, Z3);
+            Cube.add_led(X1, Y3, Z1);
+
+            Cube.add_led(X1, Y1, Z3);
+            Cube.add_led(X1, Y1, Z1);
+
+            Cube.__public_time = get_absolute_time();
+        }
+        break;
+
+    case 2:
+        if (change)
+        {
+            change = 0;
+            star_size++;
+            // Cube.clr_leds();
+            Cube.reset_display_state();
+
+            Cube.add_led(X4, Y4, Z4);
+            Cube.add_led(X4, Y4, Z0);
+
+            Cube.add_led(X4, Y0, Z4);
+            Cube.add_led(X4, Y0, Z0);
+            
+            Cube.add_led(X0, Y4, Z4);
+            Cube.add_led(X0, Y4, Z0);
+
+            Cube.add_led(X0, Y0, Z4);
+            Cube.add_led(X0, Y0, Z0);
+
+            Cube.__public_time = get_absolute_time();
+        }
+        break;
+
+    case 3:
+        if (change)
+        {
+            change = 0;
+            star_size++;
+            Cube.clr_leds();
+            Cube.reset_display_state();
+
+            Cube.add_led(X3, Y3, Z3);
+            Cube.add_led(X3, Y3, Z1);
+
+            Cube.add_led(X3, Y1, Z3);
+            Cube.add_led(X3, Y1, Z1);
+            
+            Cube.add_led(X1, Y3, Z3);
+            Cube.add_led(X1, Y3, Z1);
+
+            Cube.add_led(X1, Y1, Z3);
+            Cube.add_led(X1, Y1, Z1);
+
+            Cube.add_led(X4, Y4, Z4);
+            Cube.add_led(X4, Y4, Z0);
+
+            Cube.add_led(X4, Y0, Z4);
+            Cube.add_led(X4, Y0, Z0);
+            
+            Cube.add_led(X0, Y4, Z4);
+            Cube.add_led(X0, Y4, Z0);
+
+            Cube.add_led(X0, Y0, Z4);
+            Cube.add_led(X0, Y0, Z0);
+
+            Cube.__public_time = get_absolute_time();
+        }
+        break;
+
+    case 4:
+        if (change)
+        {
+            change = 0;
+            star_size = 0;
+            Cube.clr_leds();
+            Cube.reset_display_state();
+
+            Cube.add_led(X4, Y4, Z4);
+            Cube.add_led(X4, Y4, Z0);
+
+            Cube.add_led(X4, Y0, Z4);
+            Cube.add_led(X4, Y0, Z0);
+            
+            Cube.add_led(X0, Y4, Z4);
+            Cube.add_led(X0, Y4, Z0);
+
+            Cube.add_led(X0, Y0, Z4);
+            Cube.add_led(X0, Y0, Z0);
+
+            Cube.__public_time = get_absolute_time();
+        }
+        break;
+    
+    default:
+        break;
+    }
+    Cube.display();
+}
