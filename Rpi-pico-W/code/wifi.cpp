@@ -3,6 +3,9 @@
 extern char ssid[];
 extern char pass[];
 
+TaskHandle_t wifi_connect_handler;
+
+
 void send_message(int socket, char *msg)
 {
     int len = strlen(msg);
@@ -17,11 +20,13 @@ void send_message(int socket, char *msg)
     }
 }
 
-void handle_connection(int conn_sock, cube &Cube)
+int handle_connection(int conn_sock, cube &Cube)
 {
     led received_led;
     std::string str_buff;
-    while(1)
+    int status = 1;
+    char buffer[64];
+    while(status != 0)
     {
         if (Cube.xCubeQueue != NULL)
         {
@@ -55,8 +60,11 @@ void handle_connection(int conn_sock, cube &Cube)
         {
             send_message(conn_sock, "-------------------------\r\n");
         }
+        status = recv(conn_sock, buffer, 64, 0);
     }
+    shutdown(conn_sock, SHUT_RDWR);
     closesocket(conn_sock);
+    return 0;
 }
 
 void run_server(cube &Cube)
@@ -89,8 +97,8 @@ void run_server(cube &Cube)
     }
 
     printf("Starting server at %s on port %u\n", ip4addr_ntoa(netif_ip4_addr(netif_list)), ntohs(listen_addr.sin_port));
-
-    while (true)
+    int status = 1;
+    while (status)
     {
         struct sockaddr_storage remote_addr;
         socklen_t len = sizeof(remote_addr);
@@ -100,12 +108,12 @@ void run_server(cube &Cube)
             printf("Unable to accept incoming connection: error %d\n", errno);
             return;
         }
-        handle_connection(conn_sock, Cube);
+        status = handle_connection(conn_sock, Cube);
     }
-    vTaskDelete(NULL);
+    // vTaskDelete(NULL);
 }
 
-void wifi_connect(flag &success)
+void wifi_connect(cube &Cube)
 {
     cyw43_arch_enable_sta_mode();
 
@@ -122,14 +130,18 @@ void wifi_connect(flag &success)
         else
         {
             printf("Connected. After %d retries\n", retries);
-            success = 1;
+            Cube.connected = 1;
             break;
         }
     }
     if (retries >= 10)
     {
         printf("Cannot connect\n");
-        success = 0;
+        Cube.connected = 0;
     }
+
+    run_server(Cube);
+    Cube.connected = 0;
+    cyw43_arch_deinit();
     vTaskDelete(NULL);
 }

@@ -63,6 +63,7 @@ private:
     uint8_t __display_led_counter = 0;
 
 public:
+    flag connected = 0;
     std::vector<led> __leds;
     absolute_time_t __public_time;
     QueueHandle_t xCubeQueue = NULL; 
