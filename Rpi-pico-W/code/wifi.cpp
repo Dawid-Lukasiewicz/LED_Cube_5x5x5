@@ -32,26 +32,14 @@ int handle_connection(int conn_sock, cube &Cube)
         if (Cube.xCubeQueue != NULL)
         {
             xQueueReceive(Cube.xCubeQueue, &received_led, portMAX_DELAY);
-
             /* Send X coordinate*/
-            str_buff = std::to_string(received_led.__x);
-            char *char_buff = (char*)str_buff.c_str();
-            send_message(conn_sock, "X= ");
-            send_message(conn_sock, char_buff);
-
+            str_buff = "X" + std::to_string(received_led.__x);
             /* Send Y coordinate*/
-            str_buff = std::to_string(received_led.__y);
-            char_buff = (char*)str_buff.c_str();
-            send_message(conn_sock, " Y= ");
-            send_message(conn_sock, char_buff);
-
+            str_buff += "Y" + std::to_string(received_led.__y);
             /* Send Z coordinate*/
-            str_buff = std::to_string(received_led.__z);
-            char_buff = (char*)str_buff.c_str();
-            send_message(conn_sock, " Z= ");
-            send_message(conn_sock, char_buff);
-
-            send_message(conn_sock, "\r\n");
+            str_buff += "Z" + std::to_string(received_led.__z);
+            str_buff += "\r\n";
+            send_message(conn_sock, (char*)str_buff.c_str());
         }
         else
         {
@@ -59,7 +47,7 @@ int handle_connection(int conn_sock, cube &Cube)
         }
         if (!uxQueueMessagesWaiting(Cube.xCubeQueue))
         {
-            send_message(conn_sock, "-------------------------\r\n");
+            send_message(conn_sock, "----\r\n");
         }
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
@@ -114,7 +102,6 @@ void run_server(cube &Cube)
     shutdown(server_sock, SHUT_RDWR);
     vTaskDelay(1500);
     closesocket(server_sock);
-    // vTaskDelete(NULL);
 }
 
 void wifi_connect(cube &Cube)
@@ -147,6 +134,5 @@ void wifi_connect(cube &Cube)
     run_server(Cube);
     Cube.connected = 0;
     printf("Destroying connection task\n");
-    // cyw43_arch_deinit();
     vTaskDelete(NULL);
 }
