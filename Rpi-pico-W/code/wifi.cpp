@@ -25,7 +25,7 @@ int handle_connection(int conn_sock, cube &Cube)
     led received_led;
     std::string str_buff;
     int status = 1;
-    char buffer[64];
+    char buffer[4];
     while(status != 0)
     {
         if (Cube.xCubeQueue != NULL)
@@ -60,11 +60,10 @@ int handle_connection(int conn_sock, cube &Cube)
         {
             send_message(conn_sock, "-------------------------\r\n");
         }
-        status = recv(conn_sock, buffer, 64, 0);
+        status = recv(conn_sock, buffer, 4, 0);
+        // printf("From client %s", buffer);
     }
-    shutdown(conn_sock, SHUT_RDWR);
-    closesocket(conn_sock);
-    return 0;
+    return status;
 }
 
 void run_server(cube &Cube)
@@ -75,22 +74,24 @@ void run_server(cube &Cube)
             .sin_len = sizeof(struct sockaddr_in),
             .sin_family = AF_INET,
             .sin_port = htons(1234),
-            .sin_addr = 0,
+            .sin_addr = 0
         };
-
+    printf("server_sock = %d\n", server_sock);
     if (server_sock < 0)
     {
         printf("Unable to create socket: error %d", errno);
         return;
     }
-
-    if (bind(server_sock, (struct sockaddr *)&listen_addr, sizeof(listen_addr)) < 0)
+    int binding = bind(server_sock, (struct sockaddr *)&listen_addr, sizeof(listen_addr));
+    printf("binding = %d\n", binding);
+    if (binding < 0)
     {
         printf("Unable to bind socket: error %d\n", errno);
         return;
     }
-
-    if (listen(server_sock, 1) < 0)
+    int listening = listen(server_sock, 1);
+    printf("listening = %d\n", listening);
+    if (listening < 0)
     {
         printf("Unable to listen on socket: error %d\n", errno);
         return;
@@ -110,6 +111,9 @@ void run_server(cube &Cube)
         }
         status = handle_connection(conn_sock, Cube);
     }
+    shutdown(server_sock, SHUT_RDWR);
+    vTaskDelay(1500);
+    closesocket(server_sock);
     // vTaskDelete(NULL);
 }
 
@@ -142,6 +146,7 @@ void wifi_connect(cube &Cube)
 
     run_server(Cube);
     Cube.connected = 0;
-    cyw43_arch_deinit();
+    printf("Destroying connection task\n");
+    // cyw43_arch_deinit();
     vTaskDelete(NULL);
 }

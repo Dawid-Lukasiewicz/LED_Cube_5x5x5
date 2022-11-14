@@ -223,6 +223,7 @@ static void main_thread()
                     xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
                     /* Instead of Delay try to make notification wait */
                     vTaskDelay(10000);
+                    select_mode = 0;
                     // if (connected)
                     // {
                     //     xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
