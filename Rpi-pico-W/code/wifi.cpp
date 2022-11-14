@@ -22,11 +22,12 @@ void send_message(int socket, char *msg)
 
 int handle_connection(int conn_sock, cube &Cube)
 {
+    #define BUFFER_RD_SIZE 4
     led received_led;
     std::string str_buff;
-    int status = 1;
-    char buffer[4];
-    while(status != 0)
+    int read_size = 1;
+    char buffer[BUFFER_RD_SIZE];
+    while(read_size != 0)
     {
         if (Cube.xCubeQueue != NULL)
         {
@@ -60,10 +61,9 @@ int handle_connection(int conn_sock, cube &Cube)
         {
             send_message(conn_sock, "-------------------------\r\n");
         }
-        status = recv(conn_sock, buffer, 4, 0);
-        // printf("From client %s", buffer);
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
-    return status;
+    return read_size;
 }
 
 void run_server(cube &Cube)
