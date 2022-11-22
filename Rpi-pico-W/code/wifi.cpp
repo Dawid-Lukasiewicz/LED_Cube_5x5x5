@@ -33,18 +33,18 @@ int handle_connection(int conn_sock, cube &Cube)
         {
             xQueueReceive(Cube.xCubeQueue, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
-            str_buff += "X" + std::to_string(received_led.__x);
+            str_buff += "X" + std::to_string(received_led.__x) + ":";
             /* Send Y coordinate*/
-            str_buff += "Y" + std::to_string(received_led.__y);
+            str_buff += "Y" + std::to_string(received_led.__y)+ ":";
             /* Send Z coordinate*/
-            str_buff += "Z" + std::to_string(received_led.__z);
-            str_buff += "\r\n";
+            str_buff += "Z" + std::to_string(received_led.__z)+ ":";
+            // str_buff += "\r\n";
         }
         send_message(conn_sock, (char*)str_buff.c_str());
         str_buff.clear();
-        send_message(conn_sock, "----\r\n");
         vTaskDelay(100);
-        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 1000);
+        send_message(conn_sock, "----\r\n");
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
     }
     return read_size;
 }
