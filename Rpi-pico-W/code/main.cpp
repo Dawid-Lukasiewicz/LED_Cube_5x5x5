@@ -33,7 +33,7 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-#define NUMBER_DISPLAY_TIME     SCALE_MS_TO_US(250)
+#define NUMBER_DISPLAY_TIME     SCALE_MS_TO_US(500)
 #define DEBOUNCE_TIME           SCALE_MS_TO_US(50)
 
 #define BUTTON_UP               7U

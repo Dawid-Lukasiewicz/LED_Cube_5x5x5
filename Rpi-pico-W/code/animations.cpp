@@ -20,7 +20,7 @@ void random_led(cube &Cube)
 
         Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
     }
-    Cube.display(500);
+    Cube.display(1000);
 }
 
 void rain(cube &Cube)
@@ -29,7 +29,7 @@ void rain(cube &Cube)
     static int8_t y;
     static int8_t z;
     static flag another_drop;
-    uint rain_time_drop_ms = 50;
+    uint rain_time_drop_ms = 100;
     if (Cube.get_display_state() == DISPLAY_STATE_INIT 
         || another_drop)
     {
@@ -65,7 +65,7 @@ void heavy_rain(cube &Cube)
 {
 
     static flag another_drop;
-    uint rain_time_drop_ms = 50;
+    uint rain_time_drop_ms = 125;
     const uint8_t drop_number = 8;
 
     static led Drops[drop_number];
@@ -110,7 +110,7 @@ void heavy_rain(cube &Cube)
 
 void expanding_cube(cube &Cube)
 {
-    int expand_time_ms = 150;
+    int expand_time_ms = 350;
     static int cube_size;
     static flag expanding;
     static flag direction;
@@ -252,7 +252,7 @@ void expanding_cube(cube &Cube)
 
 void expanding_star(cube &Cube)
 {
-    int expand_time_ms = 150;
+    int expand_time_ms = 250;
     static int star_size;
     static flag change;
     static flag growing;
