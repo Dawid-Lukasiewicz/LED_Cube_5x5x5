@@ -33,12 +33,14 @@
 #define SET_Z(z) gpio_put((z), 1)
 #define CLEAR_Z(z) gpio_put((z), 0)
 
-#define NUMBER_DISPLAY_TIME     SCALE_MS_TO_US(250)
+#define NUMBER_DISPLAY_TIME     SCALE_MS_TO_US(500)
 #define DEBOUNCE_TIME           SCALE_MS_TO_US(50)
 
 #define BUTTON_UP               7U
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
+
+extern TaskHandle_t wifi_connect_handler;
 
 flag connected = 0;
 
@@ -216,16 +218,16 @@ static void main_thread()
                 nine(Cube, X_table[x_coord]);
             else
             {
-                if (!connected)
+                if (!Cube.connected)
                 {
-                    TaskHandle_t task2;
-                    xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&connected, 1, &task2);
+                    xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
                     /* Instead of Delay try to make notification wait */
-                    vTaskDelay(7500);
-                    if (connected)
-                    {
-                        xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
-                    }
+                    vTaskDelay(10000);
+                    select_mode = 0;
+                    // if (connected)
+                    // {
+                    //     xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
+                    // }
                 }
             }
             break;

@@ -23,10 +23,10 @@
 
 void send_message(int socket, char *msg);
 int handle_single_command(int conn_sock);
-void handle_connection(int conn_sock);
+int handle_connection(int conn_sock, cube &Cube);
 void run_server(cube &Cube);
 
 void wifi_initialize();
-void wifi_connect(flag &success);
+void wifi_connect(cube &Cube);
 
 #endif
