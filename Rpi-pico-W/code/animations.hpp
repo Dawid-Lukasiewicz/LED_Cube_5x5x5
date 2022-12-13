@@ -9,4 +9,6 @@ void heavy_rain(cube &Cube);
 void expanding_cube(cube &Cube);
 void expanding_star(cube &Cube);
 
+void received_pattern(cube &Cube);
+
 #endif

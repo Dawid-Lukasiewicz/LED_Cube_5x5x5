@@ -2,7 +2,9 @@
 #define CUBE
 
 #include <vector>
-// #include <memory>
+#include <map>
+#include <string>
+
 #include "pico/stdlib.h"
 
 /* FreeRTOS library*/
@@ -41,6 +43,25 @@ const uint8_t X_table[5] = {X0, X1, X2, X3, X4};
 const uint8_t Y_table[5] = {Y0, Y1, Y2, Y3, Y4};
 const uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
 
+std::map<std::string, uint8_t> pin_layouts;
+pin_layouts["X0"] = 0;
+pin_layouts["X1"] = 1;
+pin_layouts["X2"] = 2;
+pin_layouts["X3"] = 3;
+pin_layouts["X4"] = 4;
+
+pin_layouts["Y0"] = 0;
+pin_layouts["Y1"] = 1;
+pin_layouts["Y2"] = 2;
+pin_layouts["Y3"] = 3;
+pin_layouts["Y4"] = 4;
+
+pin_layouts["Z0"] = 0;
+pin_layouts["Z1"] = 1;
+pin_layouts["Z2"] = 2;
+pin_layouts["Z3"] = 3;
+pin_layouts["Z4"] = 4;
+
 #define DISPLAY_FREQ 60
 #define SCALE_S_TO_US(s_time)       ((s_time)*1000000)
 #define SCALE_MS_TO_US(ms_time)     ((ms_time)*1000)
@@ -66,7 +87,8 @@ public:
     flag connected = 0;
     std::vector<led> __leds;
     absolute_time_t __public_time;
-    QueueHandle_t xCubeQueue = NULL; 
+    QueueHandle_t xCubeQueueSend = NULL;
+    QueueHandle_t xCubeQueueReceive = NULL;
 
     cube(/* args */);
     cube(uint32_t size);
