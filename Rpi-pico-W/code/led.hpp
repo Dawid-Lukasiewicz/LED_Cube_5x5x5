@@ -12,6 +12,7 @@ public:
     int __z;
 
     led();
+    led(const led &input_led);
     led(int x, int y, int z);
     ~led();
 

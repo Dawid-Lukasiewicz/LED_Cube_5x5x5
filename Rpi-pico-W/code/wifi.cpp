@@ -152,27 +152,31 @@ void split_list(std::list<std::string> &list_string, std::string &in_string)
 int receive_data(int conn_sock, cube &Cube)
 {
     led received_led;
-    std::string str_buff;
     std::list<std::string> str_list;
     char buffer[BUFFER_LED_SIZE];
-    while (recv(conn_sock, buffer, BUFFER_LED_SIZE, 100);)
+    while (recv(conn_sock, buffer, BUFFER_LED_SIZE, 100))
     {
-        str_buff = std::to_string(buffer);
+        std::string str_buff = buffer;
         split_list(str_list, str_buff);
-        
-        int X = pin_layouts.at(str_list[0]);
-        int Y = pin_layouts.at(str_list[1]);
-        int Z = pin_layouts.at(str_list[2]);
 
+        
+        int X = Cube.pin_layouts.at(str_list.front());
+        str_list.pop_front();
+        int Y = Cube.pin_layouts.at(str_list.front());
+        str_list.pop_front();
+        int Z = Cube.pin_layouts.at(str_list.front());
+        str_list.pop_front();
+
+        // printf("LED X=%d Y=%d Z=%d\n", X, Y, Z );
         received_led.__set(X_table[X], Y_table[Y], Z_table[Z]);
 
-        // New queue needed
-        xQueueSend(Cube.xCubeQueueSend, (const void*)&received_led, 0);
+        xQueueSend(Cube.xCubeQueueReceive, (const void*)&received_led, 0);
         str_buff.clear();
         str_list.clear();
-        vTaskDelay(100);
+        vTaskDelay(1000);
         send_message(conn_sock, "S\r\n");
     }
+    return 0;
 }
 
 void run_server_receive_state(cube &Cube)

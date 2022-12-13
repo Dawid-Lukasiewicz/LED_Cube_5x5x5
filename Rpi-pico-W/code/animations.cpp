@@ -399,6 +399,7 @@ void expanding_star(cube &Cube)
 
 void received_pattern(cube &Cube)
 {
+    static flag active;
     led received_led;
     if (Cube.xCubeQueueReceive == NULL)
     {
@@ -407,9 +408,12 @@ void received_pattern(cube &Cube)
     }
     while (uxQueueMessagesWaiting(Cube.xCubeQueueReceive))
     {
-        Cube.clr_leds();
+        if (!active)    Cube.clr_leds();
+
         xQueueReceive(Cube.xCubeQueueReceive, &received_led, portMAX_DELAY);
         Cube.add_led(received_led);
+        active = 1;
     }
     Cube.display();
+    active = 0;
 }
