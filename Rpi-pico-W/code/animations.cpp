@@ -408,7 +408,11 @@ void received_pattern(cube &Cube)
     }
     while (uxQueueMessagesWaiting(Cube.xCubeQueueReceive))
     {
-        if (!active)    Cube.clr_leds();
+        if (!active)
+        {
+            Cube.reset_display_state();
+            Cube.clr_leds();
+        }
 
         xQueueReceive(Cube.xCubeQueueReceive, &received_led, portMAX_DELAY);
         Cube.add_led(received_led);

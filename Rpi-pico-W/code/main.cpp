@@ -246,6 +246,7 @@ static void main_thread()
             display_number = 0;
             break;
         }
+        /* When Select button pushed first time */
         if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
@@ -258,7 +259,7 @@ static void main_thread()
         }
 
         /* When Down button pushed first time  */
-        if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
+        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
         {
             printf("[INFO] Down button pushed\n\r");
             Cube.clr_leds();
@@ -279,7 +280,7 @@ static void main_thread()
             button_pushed_once = 1;
             pushed_start = get_absolute_time();
         }
-        /* Button Up and Down logic */
+        /* Buttons debounce logic */
         else if ( (gpio_get(BUTTON_UP) == 1 &&
                 gpio_get(BUTTON_DOWN) == 1 &&
                 button_pushed == 1 ) &&
