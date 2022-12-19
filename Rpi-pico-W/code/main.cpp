@@ -113,17 +113,17 @@ void send_to_queue(cube &Cube)
 {   
     uint uIValueToSend = 0;
 
-    if (Cube.xCubeQueue != NULL)
+    if (Cube.xCubeQueueSend != NULL)
         printf("In send: Hanlder is not NULL\r\n");
     else
         printf("In send: Hanlder is not NULL\r\n");
     while (true) {
         uIValueToSend = 1;
-        xQueueSend(Cube.xCubeQueue, &uIValueToSend, 0U);
+        xQueueSend(Cube.xCubeQueueSend, &uIValueToSend, 0U);
         vTaskDelay(100);
 
         uIValueToSend = 0;
-        xQueueSend(Cube.xCubeQueue, &uIValueToSend, 0U);
+        xQueueSend(Cube.xCubeQueueSend, &uIValueToSend, 0U);
         vTaskDelay(100);
     }
 }
@@ -141,7 +141,8 @@ static void main_thread()
 
     std::srand(std::time(nullptr));
     cube Cube(MAX_LED_AMOUNT);
-    Cube.xCubeQueue = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
+    Cube.xCubeQueueSend = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
+    Cube.xCubeQueueReceive = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
 
 
     while(1)
@@ -210,7 +211,20 @@ static void main_thread()
         case 8:
             if (!select_mode)
                 eight(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                if (!Cube.connected)
+                {
+                    xTaskCreate((TaskFunction_t)wifi_receive_state, "Receive", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
+                    vTaskDelay(10000);
+                    // select_mode = 0;
+                }
+                else
+                {
+                    /* Display received led pattern */
+                    received_pattern(Cube);
+                }
+            }
 
             break;
         case 9:
@@ -220,14 +234,10 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_connect, "Connect", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
+                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
                     /* Instead of Delay try to make notification wait */
                     vTaskDelay(10000);
                     select_mode = 0;
-                    // if (connected)
-                    // {
-                    //     xTaskCreate((TaskFunction_t)run_server, "RunServer", configMINIMAL_STACK_SIZE*10, (void*)&Cube, 1, NULL);
-                    // }
                 }
             }
             break;
@@ -236,6 +246,7 @@ static void main_thread()
             display_number = 0;
             break;
         }
+        /* When Select button pushed first time */
         if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
@@ -248,7 +259,7 @@ static void main_thread()
         }
 
         /* When Down button pushed first time  */
-        if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
+        else if (gpio_get(BUTTON_DOWN) == 0 && !button_pushed && !button_released && !select_mode)
         {
             printf("[INFO] Down button pushed\n\r");
             Cube.clr_leds();
@@ -269,7 +280,7 @@ static void main_thread()
             button_pushed_once = 1;
             pushed_start = get_absolute_time();
         }
-        /* Button Up and Down logic */
+        /* Buttons debounce logic */
         else if ( (gpio_get(BUTTON_UP) == 1 &&
                 gpio_get(BUTTON_DOWN) == 1 &&
                 button_pushed == 1 ) &&

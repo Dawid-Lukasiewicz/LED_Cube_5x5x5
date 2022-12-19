@@ -2,6 +2,13 @@
 
 led::led() {}
 
+led::led(const led &input_led)
+{
+    __x = input_led.__x;
+    __y = input_led.__y;
+    __z = input_led.__z;
+}
+
 led::led(int x, int y, int z)
 : __x(x), __y(y), __z(z)
 {}

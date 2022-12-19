@@ -6,19 +6,31 @@ cube::cube() {}
 cube::cube(uint32_t size)
 {
     __leds.reserve(size);
+    pin_layouts["X0"] = 0;
+    pin_layouts["X1"] = 1;
+    pin_layouts["X2"] = 2;
+    pin_layouts["X3"] = 3;
+    pin_layouts["X4"] = 4;
+
+    pin_layouts["Y0"] = 0;
+    pin_layouts["Y1"] = 1;
+    pin_layouts["Y2"] = 2;
+    pin_layouts["Y3"] = 3;
+    pin_layouts["Y4"] = 4;
+
+    pin_layouts["Z0"] = 0;
+    pin_layouts["Z1"] = 1;
+    pin_layouts["Z2"] = 2;
+    pin_layouts["Z3"] = 3;
+    pin_layouts["Z4"] = 4;
 }
 
 cube::~cube() {}
 
-// Not sure if this should be here
-void cube::add_leds(led *led)
+void cube::add_led(const led & input_led)
 {
-    __leds.push_back(*led);
-}
-
-void cube::add_leds(led &led)
-{
-    __leds.push_back(led);
+    led new_led(input_led);
+    __leds.push_back(new_led);
 }
 
 void cube::add_leds(std::vector<led> &leds)
@@ -39,11 +51,11 @@ void cube::emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z)
         __leds[index].__off();
         __leds[index] = led(x, y, z);
     }
-    if (xCubeQueue != NULL)
+    if (xCubeQueueSend != NULL)
     {
         for (int i = 0; i < __leds.size(); i++)
         {
-            xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
         }
     }
 }
@@ -64,11 +76,13 @@ void cube::display()
 {
     if (__display_state == 0)
     {
-        if (xCubeQueue != NULL)
+        if (__leds.size() == 0)
+            return;
+        if (xCubeQueueSend != NULL)
         {
             for (int i = 0; i < __leds.size(); i++)
             {
-                xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+                xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
             }
         }
         __display_state = 1;
@@ -102,11 +116,11 @@ void cube::display(uint64_t display_time_ms)
 {
     if (__display_state == 0)
     {
-        if (xCubeQueue != NULL)
+        if (xCubeQueueSend != NULL)
     {
         for (int i = 0; i < __leds.size(); i++)
         {
-            xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
         }
     }
         __display_state = 1;
@@ -154,11 +168,11 @@ void cube::change_X(uint8_t x)
         __leds.at(i).__off();
         __leds.at(i).__x = x;
     }
-    if (xCubeQueue != NULL)
+    if (xCubeQueueSend != NULL)
     {
         for (int i = 0; i < __leds.size(); i++)
         {
-            xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
         }
     }
 }
@@ -170,11 +184,11 @@ void cube::change_Y(uint8_t y)
         __leds.at(i).__off();
         __leds.at(i).__y = y;
     }
-    if (xCubeQueue != NULL)
+    if (xCubeQueueSend != NULL)
     {
         for (int i = 0; i < __leds.size(); i++)
         {
-            xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
         }
     }
 }
@@ -186,11 +200,11 @@ void cube::change_Z(uint8_t z)
         __leds.at(i).__off();
         __leds.at(i).__z = z;
     }
-    if (xCubeQueue != NULL)
+    if (xCubeQueueSend != NULL)
     {
         for (int i = 0; i < __leds.size(); i++)
         {
-            xQueueSend(xCubeQueue, (const void*)&__leds[i], 0);
+            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
         }
     }
 }

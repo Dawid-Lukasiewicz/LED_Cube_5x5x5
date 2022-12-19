@@ -396,3 +396,28 @@ void expanding_star(cube &Cube)
     }
     Cube.display();
 }
+
+void received_pattern(cube &Cube)
+{
+    static flag active;
+    led received_led;
+    if (Cube.xCubeQueueReceive == NULL)
+    {
+        printf("Queue is not initialized at receiving data");
+        return;
+    }
+    while (uxQueueMessagesWaiting(Cube.xCubeQueueReceive))
+    {
+        if (!active)
+        {
+            Cube.reset_display_state();
+            Cube.clr_leds();
+        }
+
+        xQueueReceive(Cube.xCubeQueueReceive, &received_led, portMAX_DELAY);
+        Cube.add_led(received_led);
+        active = 1;
+    }
+    Cube.display();
+    active = 0;
+}
