@@ -110,7 +110,7 @@ void init_buttons()
 }
 
 void send_to_queue(cube &Cube)
-{   
+{
     uint uIValueToSend = 0;
 
     if (Cube.xCubeQueueSend != NULL)
@@ -241,7 +241,7 @@ static void main_thread()
                 }
             }
             break;
-        
+
         default:
             display_number = 0;
             break;
@@ -290,12 +290,12 @@ static void main_thread()
             button_released = 1;
             released_start = get_absolute_time();
         }
-        else if (button_released && 
+        else if (button_released &&
             absolute_time_diff_us(released_start, get_absolute_time()) >= DEBOUNCE_TIME)
         {
             button_released = 0;
         }
-        
+
         /* Incrementing display number's X position */
         if (button_pushed_once ||
             (!button_pushed) &&
@@ -312,8 +312,8 @@ static void main_thread()
         }
         if (display_number > 9)         display_number = 0;
         else if (display_number < 0)    display_number = 9;
-        
-        
+
+
     }
     vTaskDelete(NULL);
 }

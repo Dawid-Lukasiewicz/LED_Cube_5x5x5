@@ -159,7 +159,7 @@ int receive_data(int conn_sock, cube &Cube)
         std::string str_buff = buffer;
         split_list(str_list, str_buff);
 
-        
+
         int X = Cube.pin_layouts.at(str_list.front());
         str_list.pop_front();
         int Y = Cube.pin_layouts.at(str_list.front());

@@ -6,8 +6,6 @@ project(test_project C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-set(FREERTOS_KERNEL_PATH "/home/dawid/Projekty/Inżynierka/LED_Cube_5x5x5/Rpi-pico-W/code/FreeRTOS-Kernel")
-
 if (NOT FREERTOS_KERNEL_PATH AND NOT DEFINED ENV{FREERTOS_KERNEL_PATH})
     message("Skipping Pico W FreeRTOS examples as FREERTOS_KERNEL_PATH not defined")
 else()
@@ -34,7 +32,7 @@ pico_add_extra_outputs(main)
 
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
 # target_link_libraries(main pico_cyw43_arch_lwip_threadsafe_background pico_stdlib)
-target_link_libraries(main 
+target_link_libraries(main
         pico_stdlib
         pico_cyw43_arch_lwip_sys_freertos
         pico_lwip_iperf
