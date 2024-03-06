@@ -14,13 +14,16 @@ endif()
 
 pico_sdk_init()
 
+set(SOURCE_DIR Source/Src)
+set(INCLUDE_DIR Source/Inc)
+
 add_executable(main
-            main.cpp
-            cube.cpp
-            led.cpp
-            numbers.cpp
-            animations.cpp
-            wifi.cpp
+            ${SOURCE_DIR}/main.cpp
+            ${SOURCE_DIR}/cube.cpp
+            ${SOURCE_DIR}/led.cpp
+            ${SOURCE_DIR}/numbers.cpp
+            ${SOURCE_DIR}/animations.cpp
+            ${SOURCE_DIR}/wifi.cpp
 )
 
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
@@ -30,7 +33,7 @@ pico_enable_stdio_usb(main 0)
 pico_enable_stdio_uart(main 1)
 pico_add_extra_outputs(main)
 
-target_include_directories(main PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
+target_include_directories(main PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${INCLUDE_DIR})
 # target_link_libraries(main pico_cyw43_arch_lwip_threadsafe_background pico_stdlib)
 target_link_libraries(main
         pico_stdlib
