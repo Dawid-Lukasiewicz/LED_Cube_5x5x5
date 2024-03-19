@@ -40,7 +40,6 @@ int handle_connection(int conn_sock, cube &Cube)
             str_buff += "Y" + std::to_string(received_led.__y)+ ":";
             /* Send Z coordinate*/
             str_buff += "Z" + std::to_string(received_led.__z)+ ":";
-            // str_buff += "\r\n";
         }
         send_message(conn_sock, (char*)str_buff.c_str());
         str_buff.clear();
@@ -105,33 +104,36 @@ void wifi_send_state(cube &Cube)
 {
     cyw43_arch_enable_sta_mode();
 
-    printf("Connecting to WiFi...\n");
+    printf("[INFO] Connecting to WiFi...\n");
+    const int max_retries = 5;
     int retries = 1;
-    for(retries; retries < 11; retries++)
+    for(retries; retries < max_retries; retries++)
     {
         int connection_status = cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000);
-        printf("Connection status: %d\n", connection_status);
+        printf("[INFO] Connection status: %d\n", connection_status);
         if (connection_status)
         {
-            printf("failed to connect. Retry: %d/10\n", retries);
+            printf("[ERROR] failed to connect. Retry: %d/%d\n", retries, max_retries);
         }
         else
         {
-            printf("Connected. After %d retries\n", retries);
+            printf("[INFO] Connected. After %d retries\n", retries);
             Cube.connected = 1;
             break;
         }
     }
-    if (retries >= 10)
+    if (!Cube.connected)
     {
-        printf("Cannot connect\n");
-        Cube.connected = 0;
+        printf("[ERROR] Cannot connect\n");
+        vTaskDelete(NULL);
+        return;
     }
 
     run_server_send_state(Cube);
     Cube.connected = 0;
-    printf("Destroying connection task\n");
+    printf("[INFO] Socket disconnected\n");
     vTaskDelete(NULL);
+    return;
 }
 
 /* RECEIVING DATA CONNECTION PART*/
