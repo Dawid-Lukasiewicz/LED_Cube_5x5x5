@@ -94,8 +94,10 @@ void run_server_send_state(cube &Cube)
             return;
         }
         status = handle_connection(conn_sock, Cube);
+        printf("[INFO] server status: %d\r\n", status);
     }
     shutdown(server_sock, SHUT_RDWR);
+    printf("[INFO] server shut down\r\n");
     vTaskDelay(1500);
     closesocket(server_sock);
 }
