@@ -193,7 +193,10 @@ static void main_thread()
         case 5:
             if (!select_mode)
                 five(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                solid_cube(Cube);
+            }
 
             break;
         case 6:

@@ -397,6 +397,24 @@ void expanding_star(cube &Cube)
     Cube.display();
 }
 
+void solid_cube(cube &Cube)
+{
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
+    {
+        for (int x = 0; x < MAX_LEDS_X; x++)
+        {
+            for (int y = 0; y < MAX_LEDS_Y; y++)
+            {
+                for (int z = 0; z < MAX_LEDS_Y; z++)
+                {
+                    Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
+                }
+            }
+        }
+    }
+    Cube.display();
+}
+
 void received_pattern(cube &Cube)
 {
     static flag active;
