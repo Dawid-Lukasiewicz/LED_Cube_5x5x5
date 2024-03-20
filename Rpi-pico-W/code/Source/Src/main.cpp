@@ -234,7 +234,7 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
+                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &wifi_connect_handler);
                     /* Instead of Delay try to make notification wait */
                     vTaskDelay(10000);
                     select_mode = 0;
@@ -321,6 +321,6 @@ static void main_thread()
 int main()
 {
     TaskHandle_t task;
-    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*10, NULL, 1, &task);
+    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task);
     vTaskStartScheduler();
 }
