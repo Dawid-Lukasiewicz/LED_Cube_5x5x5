@@ -64,11 +64,11 @@ void cube::clr_leds()
 {
     if (__leds.size() == 0)
         return;
-        
+
     for (int i = 0; i < __leds.size(); i++)
     {
         __leds[i].__off();
-    }   
+    }
     __leds.clear();
 }
 

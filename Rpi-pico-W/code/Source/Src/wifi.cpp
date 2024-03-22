@@ -45,7 +45,8 @@ int handle_connection(int conn_sock, cube &Cube)
         str_buff.clear();
         vTaskDelay(100);
         send_message(conn_sock, "----\r\n");
-        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
+        // read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, MSG_WAITALL);
     }
     return read_size;
 }
