@@ -7,12 +7,12 @@ typedef uint8_t flag;
 
 void random_led(cube &Cube)
 {
-    if (Cube.get_display_state() == 2)
+    if (Cube.get_display_state() == DISPLAY_STATE_FINISH)
     {
         Cube.clr_leds();
         Cube.reset_display_state();
     }
-    if (Cube.get_display_state() == 0)
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
     {
         uint8_t x = std::rand() % MAX_LEDS_X;
         uint8_t y = std::rand() % MAX_LEDS_Y;
@@ -399,6 +399,11 @@ void expanding_star(cube &Cube)
 
 void solid_cube(cube &Cube)
 {
+    if (Cube.get_display_state() == DISPLAY_STATE_FINISH)
+    {
+        Cube.clr_leds();
+        Cube.reset_display_state();
+    }
     if (Cube.get_display_state() == DISPLAY_STATE_INIT)
     {
         for (int x = 0; x < MAX_LEDS_X; x++)
@@ -412,7 +417,7 @@ void solid_cube(cube &Cube)
             }
         }
     }
-    Cube.display();
+    Cube.display(100);
 }
 
 void received_pattern(cube &Cube)
