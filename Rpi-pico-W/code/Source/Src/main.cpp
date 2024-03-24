@@ -257,6 +257,7 @@ static void main_thread()
         if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
+            printf("[INFO] Main task core: %d\n\r", get_core_num());
             Cube.clr_leds();
             Cube.reset_display_state();
             select_mode ^= 1;
@@ -314,7 +315,7 @@ static void main_thread()
             button_pushed_once = 0;
             ++x_coord;
             if (x_coord >= 5)   x_coord = 0;
-            Cube.change_X(X_table[x_coord]);
+            Cube.reset_display_state();
             number_display_start = get_absolute_time();
         }
         if (display_number > 9)         display_number = 0;

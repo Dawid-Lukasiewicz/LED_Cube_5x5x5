@@ -36,22 +36,23 @@ int handle_connection(int conn_sock, cube &Cube)
     char buffer[BUFFER_RD_SIZE];
     while(read_size != 0)
     {
-        while (uxQueueMessagesWaiting(Cube.xCubeQueueSend))
+        printf("[INFO] Wifi wait for notify\n");
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        printf("[INFO] Wifi released\n");
+
+        while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
         {
             xQueueReceive(Cube.xCubeQueueSend, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
-            str_buff += "X" + std::to_string(received_led.__x) + ":";
+            str_buff = "X" + std::to_string(received_led.__x) + ":";
             /* Send Y coordinate*/
             str_buff += "Y" + std::to_string(received_led.__y)+ ":";
             /* Send Z coordinate*/
             str_buff += "Z" + std::to_string(received_led.__z)+ ":";
         }
         send_message(conn_sock, (char*)str_buff.c_str());
-        str_buff.clear();
-        vTaskDelay(100);
         send_message(conn_sock, "----\r\n");
-        // read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
-        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, MSG_WAITALL);
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
     return read_size;
 }
@@ -113,6 +114,7 @@ void wifi_send_state(cube &Cube)
     cyw43_arch_enable_sta_mode();
 
     printf("[INFO] Connecting to WiFi...\n");
+    printf("[INFO] Wifi task core: %d\n\r", get_core_num());
     const int max_retries = 5;
     int retries = 1;
     for(retries; retries < max_retries; retries++)
@@ -144,6 +146,7 @@ void wifi_send_state(cube &Cube)
     run_server_send_state(Cube);
     Cube.connected = 0;
     printf("[INFO] Socket disconnected\n");
+    task_handlers::wifi_thread = NULL;
     vTaskDelete(NULL);
     return;
 }
