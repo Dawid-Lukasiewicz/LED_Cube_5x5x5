@@ -8,10 +8,8 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
-/* FreeRTOS library*/
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
+/* project files */
+#include "cube.hpp"
 
 /* lwip library */
 #include "lwip/apps/lwiperf.h"
@@ -19,8 +17,6 @@
 #include "lwip/netif.h"
 #include <lwip/sockets.h>
 
-/* project files */
-#include "cube.hpp"
 
 void send_message(int socket, char *msg);
 int handle_single_command(int conn_sock);

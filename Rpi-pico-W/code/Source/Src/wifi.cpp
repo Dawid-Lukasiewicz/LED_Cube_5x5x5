@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "apptasks.hpp"
 
 #define BUFFER_RD_SIZE 4
 #define BUFFER_LED_SIZE 64
@@ -6,7 +7,11 @@
 extern char ssid[];
 extern char pass[];
 
-TaskHandle_t wifi_connect_handler;
+namespace task_handlers
+{
+    extern TaskHandle_t main_thread;
+    extern TaskHandle_t wifi_thread;
+}
 
 
 void send_message(int socket, char *msg)
@@ -125,6 +130,10 @@ void wifi_send_state(cube &Cube)
             break;
         }
     }
+
+    xTaskNotifyGive(task_handlers::main_thread);
+    printf("[INFO] wifi -> main notification\n");
+
     if (!Cube.connected)
     {
         printf("[ERROR] Cannot connect\n");
