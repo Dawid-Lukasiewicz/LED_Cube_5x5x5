@@ -53,6 +53,7 @@ int handle_connection(int conn_sock, cube &Cube)
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
         str_buff.clear();
+        // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
     return read_size;

@@ -238,7 +238,12 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
+                    UBaseType_t core_affinity;
+
                     xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &task_handlers::wifi_thread);
+
+                    core_affinity = ( (1 << 1));
+                    vTaskCoreAffinitySet(task_handlers::wifi_thread, core_affinity);
 
                     printf("[INFO] main blocked\n");
                     ulTaskNotifyTake(pdTRUE, 10000);
@@ -328,6 +333,10 @@ static void main_thread()
 
 int main()
 {
+    UBaseType_t core_affinity;
+
     xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task_handlers::main_thread);
+    core_affinity = ( (1 << 0));
+    vTaskCoreAffinitySet(task_handlers::main_thread, core_affinity);
     vTaskStartScheduler();
 }
