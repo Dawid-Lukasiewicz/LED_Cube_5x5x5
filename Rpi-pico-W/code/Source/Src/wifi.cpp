@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "apptasks.hpp"
 
 #define BUFFER_RD_SIZE 4
 #define BUFFER_LED_SIZE 64
@@ -6,7 +7,11 @@
 extern char ssid[];
 extern char pass[];
 
-TaskHandle_t wifi_connect_handler;
+namespace task_handlers
+{
+    extern TaskHandle_t main_thread;
+    extern TaskHandle_t wifi_thread;
+}
 
 
 void send_message(int socket, char *msg)
@@ -31,7 +36,11 @@ int handle_connection(int conn_sock, cube &Cube)
     char buffer[BUFFER_RD_SIZE];
     while(read_size != 0)
     {
-        while (uxQueueMessagesWaiting(Cube.xCubeQueueSend))
+        // printf("[INFO] Wifi wait for notify\n");
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        // printf("[INFO] Wifi released\n");
+
+        while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
         {
             xQueueReceive(Cube.xCubeQueueSend, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
@@ -42,11 +51,9 @@ int handle_connection(int conn_sock, cube &Cube)
             str_buff += "Z" + std::to_string(received_led.__z)+ ":";
         }
         send_message(conn_sock, (char*)str_buff.c_str());
-        str_buff.clear();
-        vTaskDelay(100);
         send_message(conn_sock, "----\r\n");
-        // read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
-        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, MSG_WAITALL);
+        str_buff.clear();
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
     return read_size;
 }
@@ -108,6 +115,7 @@ void wifi_send_state(cube &Cube)
     cyw43_arch_enable_sta_mode();
 
     printf("[INFO] Connecting to WiFi...\n");
+    printf("[INFO] Wifi task core: %d\n\r", get_core_num());
     const int max_retries = 5;
     int retries = 1;
     for(retries; retries < max_retries; retries++)
@@ -125,6 +133,10 @@ void wifi_send_state(cube &Cube)
             break;
         }
     }
+
+    xTaskNotifyGive(task_handlers::main_thread);
+    printf("[INFO] wifi -> main notification\n");
+
     if (!Cube.connected)
     {
         printf("[ERROR] Cannot connect\n");
@@ -135,6 +147,7 @@ void wifi_send_state(cube &Cube)
     run_server_send_state(Cube);
     Cube.connected = 0;
     printf("[INFO] Socket disconnected\n");
+    task_handlers::wifi_thread = NULL;
     vTaskDelete(NULL);
     return;
 }

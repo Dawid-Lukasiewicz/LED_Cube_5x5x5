@@ -8,14 +8,10 @@
 #include "pico/cyw43_arch.h"
 
 /*custom library*/
-#include "cube.hpp"
 #include "numbers.hpp"
 #include "animations.hpp"
 #include "wifi.hpp"
 #include "password.hpp"
-
-#include "FreeRTOS.h"
-#include "task.h"
 
 #ifndef RUN_FREERTOS_ON_CORE
     #define RUN_FREERTOS_ON_CORE 1
@@ -40,9 +36,14 @@
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
 
-extern TaskHandle_t wifi_connect_handler;
 
 flag connected = 0;
+
+namespace task_handlers
+{
+    extern TaskHandle_t main_thread;
+    extern TaskHandle_t wifi_thread;
+}
 
 extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
@@ -218,7 +219,7 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_receive_state, "Receive", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
+                    xTaskCreate((TaskFunction_t)wifi_receive_state, "Receive", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &task_handlers::wifi_thread);
                     vTaskDelay(10000);
                     // select_mode = 0;
                 }
@@ -237,9 +238,12 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &wifi_connect_handler);
-                    /* Instead of Delay try to make notification wait */
-                    vTaskDelay(10000);
+                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &task_handlers::wifi_thread);
+
+                    printf("[INFO] main blocked\n");
+                    ulTaskNotifyTake(pdTRUE, 10000);
+                    printf("[INFO] main release\n");
+
                     select_mode = 0;
                 }
             }
@@ -253,6 +257,7 @@ static void main_thread()
         if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
+            printf("[INFO] Main task core: %d\n\r", get_core_num());
             Cube.clr_leds();
             Cube.reset_display_state();
             select_mode ^= 1;
@@ -310,7 +315,7 @@ static void main_thread()
             button_pushed_once = 0;
             ++x_coord;
             if (x_coord >= 5)   x_coord = 0;
-            Cube.change_X(X_table[x_coord]);
+            Cube.reset_display_state();
             number_display_start = get_absolute_time();
         }
         if (display_number > 9)         display_number = 0;
@@ -323,7 +328,6 @@ static void main_thread()
 
 int main()
 {
-    TaskHandle_t task;
-    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task);
+    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task_handlers::main_thread);
     vTaskStartScheduler();
 }
