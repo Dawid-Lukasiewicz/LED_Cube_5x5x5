@@ -29,6 +29,19 @@ add_executable(main
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
 target_compile_definitions(main PRIVATE PICO_BOARD_DEFINED=pico_wireless)
 
+if (NOT MULTICORE_BUILD AND NOT DEFINED ENV{MULTICORE_BUILD})
+    set(MULTICORE_BUILD 0)
+    message("Setting MULTICORE_BUILD to 0")
+elseif(MULTICORE_BUILD EQUAL 0)
+    set(MULTICORE_BUILD 0)
+    message("Setting MULTICORE_BUILD to 0")
+else()
+    set(MULTICORE_BUILD 1)
+    message("Setting MULTICORE_BUILD to 1")
+endif()
+
+add_compile_definitions(MULTICORE_BUILD=${MULTICORE_BUILD})
+
 pico_enable_stdio_usb(main 0)
 pico_enable_stdio_uart(main 1)
 pico_add_extra_outputs(main)
