@@ -36,15 +36,15 @@ int handle_connection(int conn_sock, cube &Cube)
     char buffer[BUFFER_RD_SIZE];
     while(read_size != 0)
     {
-        printf("[INFO] Wifi wait for notify\n");
+        // printf("[INFO] Wifi wait for notify\n");
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        printf("[INFO] Wifi released\n");
+        // printf("[INFO] Wifi released\n");
 
         while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
         {
             xQueueReceive(Cube.xCubeQueueSend, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
-            str_buff = "X" + std::to_string(received_led.__x) + ":";
+            str_buff += "X" + std::to_string(received_led.__x) + ":";
             /* Send Y coordinate*/
             str_buff += "Y" + std::to_string(received_led.__y)+ ":";
             /* Send Z coordinate*/
@@ -52,6 +52,7 @@ int handle_connection(int conn_sock, cube &Cube)
         }
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
+        str_buff.clear();
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
     return read_size;
