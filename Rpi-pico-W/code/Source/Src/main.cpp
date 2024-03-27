@@ -144,6 +144,7 @@ static void main_thread()
     cube Cube(MAX_LED_AMOUNT);
     Cube.xCubeQueueSend = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.xCubeQueueReceive = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
+    Cube.__event_group = xEventGroupCreate();
 
 
     while(1)
@@ -242,8 +243,8 @@ static void main_thread()
 
                     xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &task_handlers::wifi_thread);
 
-                    // core_affinity = ( (1 << 1));
-                    // vTaskCoreAffinitySet(task_handlers::wifi_thread, core_affinity);
+                    core_affinity = ( (1 << 1));
+                    vTaskCoreAffinitySet(task_handlers::wifi_thread, core_affinity);
 
                     printf("[INFO] main blocked\n");
                     ulTaskNotifyTake(pdTRUE, 10000);
@@ -336,7 +337,7 @@ int main()
     UBaseType_t core_affinity;
 
     xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task_handlers::main_thread);
-    // core_affinity = ( (1 << 0));
-    // vTaskCoreAffinitySet(task_handlers::main_thread, core_affinity);
+    core_affinity = ( (1 << 0));
+    vTaskCoreAffinitySet(task_handlers::main_thread, core_affinity);
     vTaskStartScheduler();
 }

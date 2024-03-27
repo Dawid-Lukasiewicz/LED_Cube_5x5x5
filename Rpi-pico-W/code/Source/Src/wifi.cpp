@@ -34,10 +34,19 @@ int handle_connection(int conn_sock, cube &Cube)
     std::string str_buff;
     int read_size = 1;
     char buffer[BUFFER_RD_SIZE];
+    EventBits_t notify_flag;
     while(read_size != 0)
     {
-        // printf("[INFO] Wifi wait for notify\n");
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, pdMS_TO_TICKS(0));
+        if(!(notify_flag & EVENT_FLAG_BIT))
+        {
+            // printf("[INFO] Wifi wait for notify\n");
+            continue;
+        }
+
         // printf("[INFO] Wifi released\n");
 
         while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
@@ -53,6 +62,7 @@ int handle_connection(int conn_sock, cube &Cube)
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
         str_buff.clear();
+        xEventGroupClearBits(Cube.__event_group, EVENT_FLAG_BIT);
         // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }

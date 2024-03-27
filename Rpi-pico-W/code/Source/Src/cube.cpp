@@ -91,7 +91,8 @@ void cube::display()
             {
                 xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
             }
-            xTaskNotifyGive(task_handlers::wifi_thread);
+            // xTaskNotifyGive(task_handlers::wifi_thread);
+            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
         }
         __display_state = 1;
         __display_led_counter = 0;
@@ -131,7 +132,8 @@ void cube::display(uint64_t display_time_ms)
             {
                 xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
             }
-            xTaskNotifyGive(task_handlers::wifi_thread);
+            // xTaskNotifyGive(task_handlers::wifi_thread);
+            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
         }
         __display_state = 1;
         __display_led_counter = 0;

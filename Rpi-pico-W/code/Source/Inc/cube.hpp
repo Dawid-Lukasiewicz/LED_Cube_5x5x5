@@ -10,6 +10,7 @@
 /* FreeRTOS library*/
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "event_groups.h"
 
 #include "led.hpp"
 
@@ -53,6 +54,8 @@ const uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
 #define DISPLAY_STATE_RUN 1
 #define DISPLAY_STATE_FINISH 2
 
+#define EVENT_FLAG_BIT  (1 << 0)
+
 class cube
 {
 private:
@@ -71,6 +74,7 @@ public:
     absolute_time_t __public_time;
     QueueHandle_t xCubeQueueSend = NULL;
     QueueHandle_t xCubeQueueReceive = NULL;
+    EventGroupHandle_t __event_group = NULL;
     std::map<std::string, uint8_t> pin_layouts;
 
     cube(/* args */);
