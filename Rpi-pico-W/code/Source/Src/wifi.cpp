@@ -41,9 +41,13 @@ int handle_connection(int conn_sock, cube &Cube)
         // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
         // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, pdMS_TO_TICKS(0));
+        unsigned heh_counter = 0;
         if(!(notify_flag & EVENT_FLAG_BIT))
         {
-            // printf("[INFO] Wifi wait for notify\n");
+            for(int i = 0; i < 100000; i++)
+            {
+                heh_counter*=2;
+            }
             continue;
         }
 
