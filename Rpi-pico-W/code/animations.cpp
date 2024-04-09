@@ -7,12 +7,12 @@ typedef uint8_t flag;
 
 void random_led(cube &Cube)
 {
-    if (Cube.get_display_state() == DISPLAY_STATE_FINISH)
+    if (Cube.get_display_state() == 2)
     {
         Cube.clr_leds();
         Cube.reset_display_state();
     }
-    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
+    if (Cube.get_display_state() == 0)
     {
         uint8_t x = std::rand() % MAX_LEDS_X;
         uint8_t y = std::rand() % MAX_LEDS_Y;
@@ -29,8 +29,8 @@ void rain(cube &Cube)
     static int8_t y;
     static int8_t z;
     static flag another_drop;
-    uint rain_time_drop_ms = 50;
-    if (Cube.get_display_state() == DISPLAY_STATE_INIT
+    uint rain_time_drop_ms = 100;
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT 
         || another_drop)
     {
         z = 4;
@@ -65,7 +65,7 @@ void heavy_rain(cube &Cube)
 {
 
     static flag another_drop;
-    uint rain_time_drop_ms = 75;
+    uint rain_time_drop_ms = 125;
     const uint8_t drop_number = 8;
 
     static led Drops[drop_number];
@@ -110,7 +110,7 @@ void heavy_rain(cube &Cube)
 
 void expanding_cube(cube &Cube)
 {
-    int expand_time_ms = 200;
+    int expand_time_ms = 350;
     static int cube_size;
     static flag expanding;
     static flag direction;
@@ -129,7 +129,7 @@ void expanding_cube(cube &Cube)
             ++cube_size;
 
         if (cube_size >= 2 || cube_size <= 0)
-            direction ^= 1;
+            direction ^= 1;  
 
         expanding = 1;
         Cube.clr_leds();
@@ -241,7 +241,7 @@ void expanding_cube(cube &Cube)
             Cube.add_led(X0, Y4, Z1);
         }
         break;
-
+    
     default:
         break;
     }
@@ -252,7 +252,7 @@ void expanding_cube(cube &Cube)
 
 void expanding_star(cube &Cube)
 {
-    int expand_time_ms = 200;
+    int expand_time_ms = 250;
     static int star_size;
     static flag change;
     static flag growing;
@@ -296,7 +296,7 @@ void expanding_star(cube &Cube)
 
             Cube.add_led(X3, Y1, Z3);
             Cube.add_led(X3, Y1, Z1);
-
+            
             Cube.add_led(X1, Y3, Z3);
             Cube.add_led(X1, Y3, Z1);
 
@@ -320,7 +320,7 @@ void expanding_star(cube &Cube)
 
             Cube.add_led(X4, Y0, Z4);
             Cube.add_led(X4, Y0, Z0);
-
+            
             Cube.add_led(X0, Y4, Z4);
             Cube.add_led(X0, Y4, Z0);
 
@@ -344,7 +344,7 @@ void expanding_star(cube &Cube)
 
             Cube.add_led(X3, Y1, Z3);
             Cube.add_led(X3, Y1, Z1);
-
+            
             Cube.add_led(X1, Y3, Z3);
             Cube.add_led(X1, Y3, Z1);
 
@@ -356,7 +356,7 @@ void expanding_star(cube &Cube)
 
             Cube.add_led(X4, Y0, Z4);
             Cube.add_led(X4, Y0, Z0);
-
+            
             Cube.add_led(X0, Y4, Z4);
             Cube.add_led(X0, Y4, Z0);
 
@@ -380,7 +380,7 @@ void expanding_star(cube &Cube)
 
             Cube.add_led(X4, Y0, Z4);
             Cube.add_led(X4, Y0, Z0);
-
+            
             Cube.add_led(X0, Y4, Z4);
             Cube.add_led(X0, Y4, Z0);
 
@@ -390,34 +390,11 @@ void expanding_star(cube &Cube)
             Cube.__public_time = get_absolute_time();
         }
         break;
-
+    
     default:
         break;
     }
     Cube.display();
-}
-
-void solid_cube(cube &Cube)
-{
-    if (Cube.get_display_state() == DISPLAY_STATE_FINISH)
-    {
-        Cube.clr_leds();
-        Cube.reset_display_state();
-    }
-    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
-    {
-        for (int x = 0; x < MAX_LEDS_X; x++)
-        {
-            for (int y = 0; y < MAX_LEDS_Y; y++)
-            {
-                for (int z = 0; z < MAX_LEDS_Y; z++)
-                {
-                    Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
-                }
-            }
-        }
-    }
-    Cube.display(100);
 }
 
 void received_pattern(cube &Cube)

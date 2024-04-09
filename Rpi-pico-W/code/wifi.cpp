@@ -1,5 +1,4 @@
 #include "wifi.hpp"
-#include "apptasks.hpp"
 
 #define BUFFER_RD_SIZE 4
 #define BUFFER_LED_SIZE 64
@@ -7,11 +6,7 @@
 extern char ssid[];
 extern char pass[];
 
-namespace task_handlers
-{
-    extern TaskHandle_t main_thread;
-    extern TaskHandle_t wifi_thread;
-}
+TaskHandle_t wifi_connect_handler;
 
 
 void send_message(int socket, char *msg)
@@ -34,36 +29,9 @@ int handle_connection(int conn_sock, cube &Cube)
     std::string str_buff;
     int read_size = 1;
     char buffer[BUFFER_RD_SIZE];
-    EventBits_t notify_flag;
     while(read_size != 0)
     {
-
-        // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, pdMS_TO_TICKS(0));
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100000);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10000);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 50);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 25);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 2);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 1);
-        notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
-
-        // unsigned heh_counter = 0;
-        if(!(notify_flag & EVENT_FLAG_BIT))
-        {
-            // for(int i = 0; i < 1000; i++)
-            // {
-            //     heh_counter+=2;
-            // }
-            continue;
-        }
-
-        // printf("[INFO] Wifi released\n");
-
-        while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
+        while (uxQueueMessagesWaiting(Cube.xCubeQueueSend))
         {
             xQueueReceive(Cube.xCubeQueueSend, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
@@ -72,13 +40,13 @@ int handle_connection(int conn_sock, cube &Cube)
             str_buff += "Y" + std::to_string(received_led.__y)+ ":";
             /* Send Z coordinate*/
             str_buff += "Z" + std::to_string(received_led.__z)+ ":";
+            // str_buff += "\r\n";
         }
         send_message(conn_sock, (char*)str_buff.c_str());
-        send_message(conn_sock, "----\r\n");
         str_buff.clear();
-        xEventGroupClearBits(Cube.__event_group, EVENT_FLAG_BIT);
-        // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
-        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
+        vTaskDelay(100);
+        send_message(conn_sock, "----\r\n");
+        read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 100);
     }
     return read_size;
 }
@@ -127,10 +95,8 @@ void run_server_send_state(cube &Cube)
             return;
         }
         status = handle_connection(conn_sock, Cube);
-        printf("[INFO] server status: %d\r\n", status);
     }
     shutdown(server_sock, SHUT_RDWR);
-    printf("[INFO] server shut down\r\n");
     vTaskDelay(1500);
     closesocket(server_sock);
 }
@@ -139,42 +105,33 @@ void wifi_send_state(cube &Cube)
 {
     cyw43_arch_enable_sta_mode();
 
-    printf("[INFO] Connecting to WiFi...\n");
-    printf("[INFO] Wifi task core: %d\n\r", get_core_num());
-    const int max_retries = 5;
+    printf("Connecting to WiFi...\n");
     int retries = 1;
-    for(retries; retries < max_retries; retries++)
+    for(retries; retries < 11; retries++)
     {
         int connection_status = cyw43_arch_wifi_connect_timeout_ms(ssid, pass, CYW43_AUTH_WPA2_AES_PSK, 10000);
-        printf("[INFO] Connection status: %d\n", connection_status);
+        printf("Connection status: %d\n", connection_status);
         if (connection_status)
         {
-            printf("[ERROR] failed to connect. Retry: %d/%d\n", retries, max_retries);
+            printf("failed to connect. Retry: %d/10\n", retries);
         }
         else
         {
-            printf("[INFO] Connected. After %d retries\n", retries);
+            printf("Connected. After %d retries\n", retries);
             Cube.connected = 1;
             break;
         }
     }
-
-    xTaskNotifyGive(task_handlers::main_thread);
-    printf("[INFO] wifi -> main notification\n");
-
-    if (!Cube.connected)
+    if (retries >= 10)
     {
-        printf("[ERROR] Cannot connect\n");
-        vTaskDelete(NULL);
-        return;
+        printf("Cannot connect\n");
+        Cube.connected = 0;
     }
 
     run_server_send_state(Cube);
     Cube.connected = 0;
-    printf("[INFO] Socket disconnected\n");
-    task_handlers::wifi_thread = NULL;
+    printf("Destroying connection task\n");
     vTaskDelete(NULL);
-    return;
 }
 
 /* RECEIVING DATA CONNECTION PART*/
@@ -202,7 +159,7 @@ int receive_data(int conn_sock, cube &Cube)
         std::string str_buff = buffer;
         split_list(str_list, str_buff);
 
-
+        
         int X = Cube.pin_layouts.at(str_list.front());
         str_list.pop_front();
         int Y = Cube.pin_layouts.at(str_list.front());

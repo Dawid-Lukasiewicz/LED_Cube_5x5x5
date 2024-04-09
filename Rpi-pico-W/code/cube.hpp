@@ -10,7 +10,6 @@
 /* FreeRTOS library*/
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "event_groups.h"
 
 #include "led.hpp"
 
@@ -45,7 +44,7 @@ const uint8_t Y_table[5] = {Y0, Y1, Y2, Y3, Y4};
 const uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
 
 
-#define DISPLAY_FREQ 120
+#define DISPLAY_FREQ 60
 #define SCALE_S_TO_US(s_time)       ((s_time)*1000000)
 #define SCALE_MS_TO_US(ms_time)     ((ms_time)*1000)
 #define SCALE_US_TO_MS(us_time)     ((us_time)/1000)
@@ -54,14 +53,12 @@ const uint8_t Z_table[5] = {Z0, Z1, Z2, Z3, Z4};
 #define DISPLAY_STATE_RUN 1
 #define DISPLAY_STATE_FINISH 2
 
-#define EVENT_FLAG_BIT  (1 << 0)
-
 class cube
 {
 private:
     absolute_time_t __display_start;
     absolute_time_t __display_led_start;
-
+    
     uint64_t __display_led_time = 0;
     uint64_t __display_time = 0;
     flag __display_state = 0;
@@ -74,13 +71,12 @@ public:
     absolute_time_t __public_time;
     QueueHandle_t xCubeQueueSend = NULL;
     QueueHandle_t xCubeQueueReceive = NULL;
-    EventGroupHandle_t __event_group = NULL;
     std::map<std::string, uint8_t> pin_layouts;
 
     cube(/* args */);
     cube(uint32_t size);
     ~cube();
-
+    
     void add_leds(std::vector<led> &leds);
     void add_led(const led &input_led);
     void add_led(uint8_t x, uint8_t y, uint8_t z);
