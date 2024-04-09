@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 
-openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "program build/main.elf verify reset exit"
-# openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "program build/main.elf verify reset"
+sudo openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000" -c "program build/main.elf verify reset exit"
+# sudo openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000" -c "program build/main.elf verify reset"
