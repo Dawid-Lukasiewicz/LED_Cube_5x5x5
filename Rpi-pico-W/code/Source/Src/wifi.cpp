@@ -39,15 +39,25 @@ int handle_connection(int conn_sock, cube &Cube)
     {
 
         // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
         // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, pdMS_TO_TICKS(0));
-        unsigned heh_counter = 0;
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100000);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10000);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 50);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 25);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 2);
+        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 1);
+        notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
+
+        // unsigned heh_counter = 0;
         if(!(notify_flag & EVENT_FLAG_BIT))
         {
-            for(int i = 0; i < 100000; i++)
-            {
-                heh_counter*=2;
-            }
+            // for(int i = 0; i < 1000; i++)
+            // {
+            //     heh_counter+=2;
+            // }
             continue;
         }
 
