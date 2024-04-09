@@ -8,14 +8,10 @@
 #include "pico/cyw43_arch.h"
 
 /*custom library*/
-#include "cube.hpp"
 #include "numbers.hpp"
 #include "animations.hpp"
 #include "wifi.hpp"
 #include "password.hpp"
-
-#include "FreeRTOS.h"
-#include "task.h"
 
 #ifndef RUN_FREERTOS_ON_CORE
     #define RUN_FREERTOS_ON_CORE 1
@@ -40,9 +36,14 @@
 #define BUTTON_DOWN             8U
 #define BUTTON_SELECT           9U
 
-extern TaskHandle_t wifi_connect_handler;
 
 flag connected = 0;
+
+namespace task_handlers
+{
+    extern TaskHandle_t main_thread;
+    extern TaskHandle_t wifi_thread;
+}
 
 extern const uint8_t X_table[5];
 extern const uint8_t Y_table[5];
@@ -110,7 +111,7 @@ void init_buttons()
 }
 
 void send_to_queue(cube &Cube)
-{   
+{
     uint uIValueToSend = 0;
 
     if (Cube.xCubeQueueSend != NULL)
@@ -143,6 +144,7 @@ static void main_thread()
     cube Cube(MAX_LED_AMOUNT);
     Cube.xCubeQueueSend = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.xCubeQueueReceive = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
+    Cube.__event_group = xEventGroupCreate();
 
 
     while(1)
@@ -193,7 +195,10 @@ static void main_thread()
         case 5:
             if (!select_mode)
                 five(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                solid_cube(Cube);
+            }
 
             break;
         case 6:
@@ -215,7 +220,7 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_receive_state, "Receive", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
+                    xTaskCreate((TaskFunction_t)wifi_receive_state, "Receive", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &task_handlers::wifi_thread);
                     vTaskDelay(10000);
                     // select_mode = 0;
                 }
@@ -234,14 +239,22 @@ static void main_thread()
             {
                 if (!Cube.connected)
                 {
-                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*6, (void*)&Cube, 1, &wifi_connect_handler);
-                    /* Instead of Delay try to make notification wait */
-                    vTaskDelay(10000);
+                    UBaseType_t core_affinity;
+
+                    xTaskCreate((TaskFunction_t)wifi_send_state, "Send", configMINIMAL_STACK_SIZE*2, (void*)&Cube, 4, &task_handlers::wifi_thread);
+#if MULTICORE_BUILD
+                    core_affinity = ( (1 << 1));
+                    vTaskCoreAffinitySet(task_handlers::wifi_thread, core_affinity);
+#endif
+                    printf("[INFO] main blocked\n");
+                    ulTaskNotifyTake(pdTRUE, 10000);
+                    printf("[INFO] main release\n");
+
                     select_mode = 0;
                 }
             }
             break;
-        
+
         default:
             display_number = 0;
             break;
@@ -250,6 +263,7 @@ static void main_thread()
         if(gpio_get(BUTTON_SELECT) == 0 && !button_pushed && !button_released)
         {
             printf("[INFO] Select button pushed\n\r");
+            printf("[INFO] Main task core: %d\n\r", get_core_num());
             Cube.clr_leds();
             Cube.reset_display_state();
             select_mode ^= 1;
@@ -290,12 +304,12 @@ static void main_thread()
             button_released = 1;
             released_start = get_absolute_time();
         }
-        else if (button_released && 
+        else if (button_released &&
             absolute_time_diff_us(released_start, get_absolute_time()) >= DEBOUNCE_TIME)
         {
             button_released = 0;
         }
-        
+
         /* Incrementing display number's X position */
         if (button_pushed_once ||
             (!button_pushed) &&
@@ -307,20 +321,25 @@ static void main_thread()
             button_pushed_once = 0;
             ++x_coord;
             if (x_coord >= 5)   x_coord = 0;
-            Cube.change_X(X_table[x_coord]);
+            Cube.reset_display_state();
             number_display_start = get_absolute_time();
         }
         if (display_number > 9)         display_number = 0;
         else if (display_number < 0)    display_number = 9;
-        
-        
+
+
     }
     vTaskDelete(NULL);
 }
 
 int main()
 {
-    TaskHandle_t task;
-    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*10, NULL, 1, &task);
+    UBaseType_t core_affinity;
+
+    xTaskCreate((TaskFunction_t)main_thread, "MainThread", configMINIMAL_STACK_SIZE*2, NULL, 1, &task_handlers::main_thread);
+#if MULTICORE_BUILD
+    core_affinity = ( (1 << 0));
+    vTaskCoreAffinitySet(task_handlers::main_thread, core_affinity);
+#endif /* MULTICORE_BUILD */
     vTaskStartScheduler();
 }

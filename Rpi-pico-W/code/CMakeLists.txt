@@ -6,8 +6,6 @@ project(test_project C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-set(FREERTOS_KERNEL_PATH "/home/dawid/Projekty/Inżynierka/LED_Cube_5x5x5/Rpi-pico-W/code/FreeRTOS-Kernel")
-
 if (NOT FREERTOS_KERNEL_PATH AND NOT DEFINED ENV{FREERTOS_KERNEL_PATH})
     message("Skipping Pico W FreeRTOS examples as FREERTOS_KERNEL_PATH not defined")
 else()
@@ -16,25 +14,41 @@ endif()
 
 pico_sdk_init()
 
+set(SOURCE_DIR Source/Src)
+set(INCLUDE_DIR Source/Inc)
+
 add_executable(main
-            main.cpp
-            cube.cpp
-            led.cpp
-            numbers.cpp
-            animations.cpp
-            wifi.cpp
+            ${SOURCE_DIR}/main.cpp
+            ${SOURCE_DIR}/cube.cpp
+            ${SOURCE_DIR}/led.cpp
+            ${SOURCE_DIR}/numbers.cpp
+            ${SOURCE_DIR}/animations.cpp
+            ${SOURCE_DIR}/wifi.cpp
 )
 
 set_target_properties(main PROPERTIES PICO_BOARD pico_w)
 target_compile_definitions(main PRIVATE PICO_BOARD_DEFINED=pico_wireless)
 
+if (NOT MULTICORE_BUILD AND NOT DEFINED ENV{MULTICORE_BUILD})
+    set(MULTICORE_BUILD 0)
+    message("Setting MULTICORE_BUILD to 0")
+elseif(MULTICORE_BUILD EQUAL 0)
+    set(MULTICORE_BUILD 0)
+    message("Setting MULTICORE_BUILD to 0")
+else()
+    set(MULTICORE_BUILD 1)
+    message("Setting MULTICORE_BUILD to 1")
+endif()
+
+add_compile_definitions(MULTICORE_BUILD=${MULTICORE_BUILD})
+
 pico_enable_stdio_usb(main 0)
 pico_enable_stdio_uart(main 1)
 pico_add_extra_outputs(main)
 
-target_include_directories(main PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
+target_include_directories(main PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${INCLUDE_DIR})
 # target_link_libraries(main pico_cyw43_arch_lwip_threadsafe_background pico_stdlib)
-target_link_libraries(main 
+target_link_libraries(main
         pico_stdlib
         pico_cyw43_arch_lwip_sys_freertos
         pico_lwip_iperf

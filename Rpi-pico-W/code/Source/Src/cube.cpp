@@ -1,6 +1,12 @@
 #include "cube.hpp"
 #include <stdio.h>
 
+namespace task_handlers
+{
+    extern TaskHandle_t main_thread;
+    extern TaskHandle_t wifi_thread;
+}
+
 cube::cube() {}
 
 cube::cube(uint32_t size)
@@ -64,11 +70,11 @@ void cube::clr_leds()
 {
     if (__leds.size() == 0)
         return;
-        
+
     for (int i = 0; i < __leds.size(); i++)
     {
         __leds[i].__off();
-    }   
+    }
     __leds.clear();
 }
 
@@ -78,12 +84,15 @@ void cube::display()
     {
         if (__leds.size() == 0)
             return;
-        if (xCubeQueueSend != NULL)
+        if (xCubeQueueSend != NULL && task_handlers::wifi_thread != NULL)
         {
+            // printf("[DEV] Main task core: %d\n\r", get_core_num());
             for (int i = 0; i < __leds.size(); i++)
             {
                 xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
             }
+            // xTaskNotifyGive(task_handlers::wifi_thread);
+            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
         }
         __display_state = 1;
         __display_led_counter = 0;
@@ -116,13 +125,16 @@ void cube::display(uint64_t display_time_ms)
 {
     if (__display_state == 0)
     {
-        if (xCubeQueueSend != NULL)
-    {
-        for (int i = 0; i < __leds.size(); i++)
+        if (xCubeQueueSend != NULL && task_handlers::wifi_thread != NULL)
         {
-            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
+            // printf("[DEV] Main task core: %d\n\r", get_core_num());
+            for (int i = 0; i < __leds.size(); i++)
+            {
+                xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
+            }
+            // xTaskNotifyGive(task_handlers::wifi_thread);
+            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
         }
-    }
         __display_state = 1;
         __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
@@ -168,13 +180,6 @@ void cube::change_X(uint8_t x)
         __leds.at(i).__off();
         __leds.at(i).__x = x;
     }
-    if (xCubeQueueSend != NULL)
-    {
-        for (int i = 0; i < __leds.size(); i++)
-        {
-            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
-        }
-    }
 }
 
 void cube::change_Y(uint8_t y)
@@ -184,13 +189,6 @@ void cube::change_Y(uint8_t y)
         __leds.at(i).__off();
         __leds.at(i).__y = y;
     }
-    if (xCubeQueueSend != NULL)
-    {
-        for (int i = 0; i < __leds.size(); i++)
-        {
-            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
-        }
-    }
 }
 
 void cube::change_Z(uint8_t z)
@@ -199,13 +197,6 @@ void cube::change_Z(uint8_t z)
     {
         __leds.at(i).__off();
         __leds.at(i).__z = z;
-    }
-    if (xCubeQueueSend != NULL)
-    {
-        for (int i = 0; i < __leds.size(); i++)
-        {
-            xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
-        }
     }
 }
 
