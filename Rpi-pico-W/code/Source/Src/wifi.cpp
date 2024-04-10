@@ -33,6 +33,7 @@ int handle_connection(int conn_sock, cube &Cube)
     led received_led;
     std::string str_buff;
     int read_size = 1;
+    int current_size = 0;
     char buffer[BUFFER_RD_SIZE];
     EventBits_t notify_flag;
     while(read_size != 0)
@@ -40,43 +41,28 @@ int handle_connection(int conn_sock, cube &Cube)
 
         // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, pdMS_TO_TICKS(0));
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100000);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10000);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 100);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 50);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 25);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 10);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 2);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 1);
-        notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
+        // if(!(notify_flag & EVENT_FLAG_BIT))
+        // {
+        //     continue;
+        // }
 
-        // unsigned heh_counter = 0;
-        if(!(notify_flag & EVENT_FLAG_BIT))
+        vTaskDelay(10);
+        xSemaphoreTake(Cube.CubeStateSemaphore, portMAX_DELAY);
+        current_size = Cube.__leds.size();
+        for (int i = 0; i < current_size; i++)
         {
-            // for(int i = 0; i < 1000; i++)
-            // {
-            //     heh_counter+=2;
-            // }
-            continue;
-        }
-
-        // printf("[INFO] Wifi released\n");
-
-        while(uxQueueMessagesWaiting(Cube.xCubeQueueSend))
-        {
-            xQueueReceive(Cube.xCubeQueueSend, &received_led, portMAX_DELAY);
             /* Send X coordinate*/
-            str_buff += "X" + std::to_string(received_led.__x) + ":";
+            str_buff += "X" + std::to_string(Cube.__leds.at(i).__x) + ":";
             /* Send Y coordinate*/
-            str_buff += "Y" + std::to_string(received_led.__y)+ ":";
+            str_buff += "Y" + std::to_string(Cube.__leds.at(i).__y)+ ":";
             /* Send Z coordinate*/
-            str_buff += "Z" + std::to_string(received_led.__z)+ ":";
+            str_buff += "Z" + std::to_string(Cube.__leds.at(i).__z)+ ":";
         }
+        xSemaphoreGive(Cube.CubeStateSemaphore);
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
         str_buff.clear();
-        xEventGroupClearBits(Cube.__event_group, EVENT_FLAG_BIT);
+        // xEventGroupClearBits(Cube.__event_group, EVENT_FLAG_BIT);
         // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }

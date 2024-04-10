@@ -10,6 +10,7 @@
 /* FreeRTOS library*/
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "semphr.h"
 #include "event_groups.h"
 
 #include "led.hpp"
@@ -75,6 +76,7 @@ public:
     QueueHandle_t xCubeQueueSend = NULL;
     QueueHandle_t xCubeQueueReceive = NULL;
     EventGroupHandle_t __event_group = NULL;
+    SemaphoreHandle_t CubeStateSemaphore = NULL;
     std::map<std::string, uint8_t> pin_layouts;
 
     cube(/* args */);

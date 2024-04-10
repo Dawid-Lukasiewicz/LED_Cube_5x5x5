@@ -145,6 +145,7 @@ static void main_thread()
     Cube.xCubeQueueSend = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.xCubeQueueReceive = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.__event_group = xEventGroupCreate();
+    Cube.CubeStateSemaphore = xSemaphoreCreateMutex();
 
 
     while(1)

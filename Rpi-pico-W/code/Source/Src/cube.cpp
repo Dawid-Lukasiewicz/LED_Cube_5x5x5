@@ -68,6 +68,7 @@ void cube::emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z)
 
 void cube::clr_leds()
 {
+    xSemaphoreTake(CubeStateSemaphore, 10);
     if (__leds.size() == 0)
         return;
 
@@ -82,18 +83,10 @@ void cube::display()
 {
     if (__display_state == 0)
     {
+        xSemaphoreGive(CubeStateSemaphore);
         if (__leds.size() == 0)
             return;
-        if (xCubeQueueSend != NULL && task_handlers::wifi_thread != NULL)
-        {
-            // printf("[DEV] Main task core: %d\n\r", get_core_num());
-            for (int i = 0; i < __leds.size(); i++)
-            {
-                xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
-            }
-            // xTaskNotifyGive(task_handlers::wifi_thread);
-            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
-        }
+
         __display_state = 1;
         __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
@@ -123,18 +116,12 @@ void cube::display()
 
 void cube::display(uint64_t display_time_ms)
 {
+    xSemaphoreGive(CubeStateSemaphore);
     if (__display_state == 0)
     {
-        if (xCubeQueueSend != NULL && task_handlers::wifi_thread != NULL)
-        {
-            // printf("[DEV] Main task core: %d\n\r", get_core_num());
-            for (int i = 0; i < __leds.size(); i++)
-            {
-                xQueueSend(xCubeQueueSend, (const void*)&__leds[i], 0);
-            }
-            // xTaskNotifyGive(task_handlers::wifi_thread);
-            xEventGroupSetBits(__event_group, EVENT_FLAG_BIT);
-        }
+        if (__leds.size() == 0)
+            return;
+
         __display_state = 1;
         __display_led_counter = 0;
         __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
