@@ -68,7 +68,7 @@ void cube::emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z)
 
 void cube::clr_leds()
 {
-    xSemaphoreTake(CubeStateSemaphore, 10);
+    // xSemaphoreTake(CubeStateSemaphore, 10);
     if (__leds.size() == 0)
         return;
 
@@ -83,7 +83,7 @@ void cube::display()
 {
     if (__display_state == 0)
     {
-        xSemaphoreGive(CubeStateSemaphore);
+        // xSemaphoreGive(CubeStateSemaphore);
         if (__leds.size() == 0)
             return;
 
@@ -116,7 +116,7 @@ void cube::display()
 
 void cube::display(uint64_t display_time_ms)
 {
-    xSemaphoreGive(CubeStateSemaphore);
+    // xSemaphoreGive(CubeStateSemaphore);
     if (__display_state == 0)
     {
         if (__leds.size() == 0)

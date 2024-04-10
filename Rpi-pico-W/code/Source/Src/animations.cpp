@@ -417,7 +417,7 @@ void solid_cube(cube &Cube)
             }
         }
     }
-    Cube.display(100);
+    Cube.display();
 }
 
 void received_pattern(cube &Cube)
