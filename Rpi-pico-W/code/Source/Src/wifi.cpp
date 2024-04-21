@@ -40,14 +40,14 @@ int handle_connection(int conn_sock, cube &Cube)
     {
 
         // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        // notify_flag = xEventGroupWaitBits(Cube.__event_group, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 0);
-        // if(!(notify_flag & EVENT_FLAG_BIT))
-        // {
-        //     continue;
-        // }
+        notify_flag = xEventGroupWaitBits(Cube.CubeEventFlag, EVENT_FLAG_BIT, pdTRUE, pdTRUE, 1);
+        if(!(notify_flag & EVENT_FLAG_BIT))
+        {
+            continue;
+        }
 
         // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
-        vTaskDelay(25);
+        // vTaskDelay(25);
         // xSemaphoreTake(Cube.CubeStateSemaphore, portMAX_DELAY);
         current_size = Cube.__leds.size();
         for (int i = 0; i < current_size; i++)
@@ -63,7 +63,7 @@ int handle_connection(int conn_sock, cube &Cube)
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
         str_buff.clear();
-        // xEventGroupClearBits(Cube.__event_group, EVENT_FLAG_BIT);
+        xEventGroupClearBits(Cube.CubeEventFlag, EVENT_FLAG_BIT);
         read_size = recv(conn_sock, buffer, BUFFER_RD_SIZE, 0);
     }
     return read_size;
