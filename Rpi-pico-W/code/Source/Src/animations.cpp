@@ -444,3 +444,63 @@ void received_pattern(cube &Cube)
     Cube.display();
     active = 0;
 }
+
+void benchmark_animiation(cube &Cube, uint8_t &select_flag, uint64_t measure_time)
+{
+    const int max_counts = measure_time;
+    static int counter;
+    static absolute_time_t measure_start;
+    static absolute_time_t measure_end;
+    if (counter == 0 && Cube.get_display_state() == DISPLAY_STATE_INIT)
+    {
+        printf("Begin measure\r\n");
+        measure_start = get_absolute_time();
+    }
+
+    if (Cube.get_display_state() == DISPLAY_STATE_FINISH)
+    {
+        counter++;
+        Cube.clr_leds();
+        Cube.reset_display_state();
+    }
+    if (Cube.get_display_state() == DISPLAY_STATE_INIT)
+    {
+        xSemaphoreTake(Cube.CubeStateSemaphore, 10);
+        for (int x = 0; x < MAX_LEDS_X; x++)
+        {
+            for (int y = 0; y < MAX_LEDS_Y; y++)
+            {
+                for (int z = 0; z < MAX_LEDS_Y; z++)
+                {
+                    Cube.add_led(X_table[x], Y_table[y], Z_table[z]);
+                }
+            }
+        }
+        xSemaphoreGive(Cube.CubeStateSemaphore);
+    }
+
+    Cube.benchmark_display();
+
+    if (counter >= max_counts)
+    {
+        uint64_t us_measure_start;
+        uint64_t us_measure_end;
+        int64_t us_measure_diff;
+
+        xSemaphoreGive(Cube.CubeStateSemaphore);
+
+        select_flag = 0;
+        counter = 0;
+        measure_end = get_absolute_time();
+
+        us_measure_start = to_us_since_boot(measure_start);
+        us_measure_end = to_us_since_boot(measure_end);
+        us_measure_diff = us_measure_end - us_measure_start;
+
+        printf("End measure\r\n");
+        printf("Start measure:      %llu\r\n", us_measure_start);
+        printf("End measure:        %llu\r\n", us_measure_end);
+        printf("Difference in us:   %lld [us]\r\n", us_measure_diff);
+        printf("Difference in s:    %lld [s]\r\n", us_measure_diff/1'000'000);
+    }
+}

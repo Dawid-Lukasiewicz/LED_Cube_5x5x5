@@ -145,7 +145,7 @@ static void main_thread()
     Cube.xCubeQueueSend = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.xCubeQueueReceive = xQueueCreate(MAX_LED_AMOUNT, sizeof(led));
     Cube.CubeEventFlag = xEventGroupCreate();
-    // Cube.CubeStateSemaphore = xSemaphoreCreateMutex();
+    Cube.CubeStateSemaphore = xSemaphoreCreateMutex();
 
 
     while(1)
@@ -205,13 +205,19 @@ static void main_thread()
         case 6:
             if (!select_mode)
                 six(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                benchmark_animiation(Cube, select_mode, 1000);
+            }
 
             break;
         case 7:
             if (!select_mode)
                 seven(Cube, X_table[x_coord]);
-            else    {}
+            else
+            {
+                benchmark_animiation(Cube, select_mode, 10000);
+            }
 
             break;
         case 8:

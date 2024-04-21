@@ -48,7 +48,7 @@ int handle_connection(int conn_sock, cube &Cube)
 
         // printf("[DEV] Wifi task core: %d\n\r", get_core_num());
         // vTaskDelay(25);
-        // xSemaphoreTake(Cube.CubeStateSemaphore, portMAX_DELAY);
+        xSemaphoreTake(Cube.CubeStateSemaphore, portMAX_DELAY);
         current_size = Cube.__leds.size();
         for (int i = 0; i < current_size; i++)
         {
@@ -59,7 +59,7 @@ int handle_connection(int conn_sock, cube &Cube)
             /* Send Z coordinate*/
             str_buff += "Z" + std::to_string(Cube.__leds.at(i).__z)+ ":";
         }
-        // xSemaphoreGive(Cube.CubeStateSemaphore);
+        xSemaphoreGive(Cube.CubeStateSemaphore);
         send_message(conn_sock, (char*)str_buff.c_str());
         send_message(conn_sock, "----\r\n");
         str_buff.clear();

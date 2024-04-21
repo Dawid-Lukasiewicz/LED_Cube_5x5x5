@@ -68,7 +68,7 @@ void cube::emplace_led(uint8_t index, uint8_t x, uint8_t y, uint8_t z)
 
 void cube::clr_leds()
 {
-    // xSemaphoreTake(CubeStateSemaphore, 5);
+    xSemaphoreTake(CubeStateSemaphore, 10);
     if (__leds.size() == 0)
         return;
 
@@ -83,7 +83,7 @@ void cube::display()
 {
     if (__display_state == 0)
     {
-        // xSemaphoreGive(CubeStateSemaphore);
+        xSemaphoreGive(CubeStateSemaphore);
         xEventGroupSetBits(CubeEventFlag, EVENT_FLAG_BIT);
         if (__leds.size() == 0)
             return;
@@ -117,7 +117,7 @@ void cube::display()
 
 void cube::display(uint64_t display_time_ms)
 {
-    // xSemaphoreGive(CubeStateSemaphore);
+    xSemaphoreGive(CubeStateSemaphore);
     if (__display_state == 0)
     {
         xEventGroupSetBits(CubeEventFlag, EVENT_FLAG_BIT);
@@ -159,6 +159,41 @@ void cube::display(uint64_t display_time_ms)
     {
         __leds.at(__display_led_counter).__off();
         __display_state = 2;
+    }
+}
+
+void cube::benchmark_display()
+{
+    if (__display_state == DISPLAY_STATE_INIT)
+    {
+        xEventGroupSetBits(CubeEventFlag, EVENT_FLAG_BIT);
+        if (__leds.size() == 0)
+            return;
+
+        __display_state = DISPLAY_STATE_RUN;
+        __display_led_counter = 0;
+        __display_led_time = SCALE_S_TO_US(1) / (__leds.size()*DISPLAY_FREQ);
+    }
+    if (__display_state == DISPLAY_STATE_RUN)
+    {
+        if (__display_led == 0)
+        {
+            __display_led = 1;
+            __display_led_start = get_absolute_time();
+        }
+        if ( __display_led == 1
+                && absolute_time_diff_us(__display_led_start, get_absolute_time()) <= __display_led_time )
+            {
+                __leds.at(__display_led_counter).__on();
+            }
+        else
+        {
+            __display_led = 0;
+            __leds.at(__display_led_counter).__off();
+
+            ++__display_led_counter;
+            if (__display_led_counter >= __leds.size()) __display_state = DISPLAY_STATE_FINISH;
+        }
     }
 }
 
